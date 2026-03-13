@@ -1,0 +1,206 @@
+import { createClient } from './server'
+
+export type Course = {
+  id: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  color_hex: string;
+  slug: string;
+  created_at: string;
+};
+
+export type Track = {
+  id: string;
+  course_id: string;
+  title: string;
+  difficulty_level: string;
+  order_index: number;
+  created_at: string;
+};
+
+export type Level = {
+  id: string;
+  track_id: string;
+  level_number: number;
+  title: string;
+  xp_reward: number;
+  created_at: string;
+};
+
+export type UserProgress = {
+  id: string;
+  user_id: string;
+  course_id: string;
+  track_id: string;
+  current_level: number;
+  hearts_remaining: number;
+  total_xp: number;
+  last_activity: string | null;
+};
+
+export async function getCourses(): Promise<Course[]> {
+  const supabase = createClient();
+  const { data: courses, error } = await supabase
+    .from('courses')
+    .select('*')
+    .order('title');
+
+  if (error) {
+    console.error("Error fetching courses:", error.message);
+    return [];
+  }
+  return courses || [];
+}
+
+export async function getCourseBySlug(slug: string): Promise<Course | null> {
+  const supabase = createClient();
+  const { data: course, error } = await supabase
+    .from('courses')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (error) {
+    console.error("Error fetching course by slug:", error.message);
+    return null;
+  }
+  return course;
+}
+
+export async function getTracks(courseId: string): Promise<Track[]> {
+  const supabase = createClient();
+  const { data: tracks, error } = await supabase
+    .from('tracks')
+    .select('*')
+    .eq('course_id', courseId)
+    .order('order_index');
+
+  if (error) {
+    console.error("Error fetching tracks:", error.message);
+    return [];
+  }
+  return tracks || [];
+}
+
+export async function getUserProgress(userId: string, courseId: string): Promise<UserProgress | null> {
+  const supabase = createClient();
+  const { data: progress, error } = await supabase
+    .from('user_progress')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('course_id', courseId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error fetching user progress:", error.message);
+    return null;
+  }
+  return progress;
+}
+
+export async function getLevels(trackId: string): Promise<Level[]> {
+  const supabase = createClient();
+  const { data: levels, error } = await supabase
+    .from('levels')
+    .select('*')
+    .eq('track_id', trackId)
+    .order('level_number', { ascending: true });
+
+  if (error) {
+    console.error("Error fetching levels:", error.message);
+    return [];
+  }
+  return levels || [];
+}
+
+export type Lesson = {
+  id: string;
+  level_id: string;
+  title: string;
+  lesson_type: string;
+  lesson_order: number;
+  created_at: string;
+};
+
+export type Question = {
+  id: string;
+  lesson_id: string;
+  question_type: string;
+  question_text: string;
+  explanation: string | null;
+  created_at: string;
+};
+
+export type Answer = {
+  id: string;
+  question_id: string;
+  answer_text: string;
+  is_correct: boolean;
+};
+
+export async function getLessons(levelId: string): Promise<Lesson[]> {
+  const supabase = createClient();
+  const { data: lessons, error } = await supabase
+    .from('lessons')
+    .select('*')
+    .eq('level_id', levelId)
+    .order('lesson_order', { ascending: true });
+
+  if (error) {
+    console.error("Error fetching lessons:", error.message);
+    return [];
+  }
+  return lessons || [];
+}
+
+export async function getQuestions(lessonId: string): Promise<Question[]> {
+  const supabase = createClient();
+  const { data: questions, error } = await supabase
+    .from('questions')
+    .select('*')
+    .eq('lesson_id', lessonId)
+    .order('created_at', { ascending: true }); // Can add custom order field later if needed
+
+  if (error) {
+    console.error("Error fetching questions:", error.message);
+    return [];
+  }
+  return questions || [];
+}
+
+export async function getAnswers(questionId: string): Promise<Answer[]> {
+  const supabase = createClient();
+  const { data: answers, error } = await supabase
+    .from('answers')
+    .select('*')
+    .eq('question_id', questionId);
+
+  if (error) {
+    console.error("Error fetching answers:", error.message);
+    return [];
+  }
+  return answers || [];
+}
+
+export type UserLeaderboard = {
+  id: string;
+  username: string;
+  avatar_url: string;
+  total_xp: number;
+};
+
+export async function getLeaderboard(limit = 50, offset = 0): Promise<UserLeaderboard[]> {
+  const supabase = createClient();
+  const { data: users, error } = await supabase
+    .from('users')
+    .select('id, username, avatar_url, total_xp')
+    .order('total_xp', { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (error) {
+    console.error("Error fetching leaderboard:", error.message);
+    return [];
+  }
+  return users || [];
+}
