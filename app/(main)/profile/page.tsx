@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { ProfileForm } from "./profile-form";
+import { ProfileForm } from "@/app/(main)/profile/profile-form";
 import { redirect } from "next/navigation";
 
 export default async function ProfilePage() {
@@ -24,8 +24,8 @@ export default async function ProfilePage() {
       </div>
 
       <div className="bg-white border-2 border-slate-100 rounded-3xl p-8 shadow-sm">
-        <ProfileForm 
-          initialUsername={dbUser?.username || ""} 
+        <ProfileForm
+          initialUsername={dbUser?.username || ""}
           initialAvatar={dbUser?.avatar_url || ""}
           email={user.email || ""}
         />
