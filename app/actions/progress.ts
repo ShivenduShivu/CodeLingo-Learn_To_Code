@@ -123,6 +123,20 @@ export async function completeLevel(levelId: string, correctCount: number, total
       });
   }
 
+  // Update global user total_xp
+  const { data: globalUserData } = await supabase
+    .from('users')
+    .select('total_xp')
+    .eq('id', user.id)
+    .single();
+
+  if (globalUserData) {
+    await supabase
+      .from('users')
+      .update({ total_xp: (globalUserData.total_xp || 0) + xpEarned })
+      .eq('id', user.id);
+  }
+
   // 6. Check Achievements (Event-driven broadcast)
   const unlockPromises = [
     checkAchievements(user.id, 'FIRST_LESSON', 1),

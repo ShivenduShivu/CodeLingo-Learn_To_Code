@@ -52,7 +52,7 @@ export function ProfileForm({ initialUsername, initialAvatar, email }: Props) {
         </div>
         <div className="space-y-1">
           <p className="font-bold text-slate-900">Current Avatar</p>
-          <p className="text-xs text-slate-500 font-medium leading-relaxed">Customize your avatar by pasting any valid image URL or a Dicebear seed below.</p>
+          <p className="text-xs text-slate-500 font-medium leading-relaxed">Choose an avatar from the options below to represent your profile.</p>
         </div>
       </div>
 
@@ -79,14 +79,25 @@ export function ProfileForm({ initialUsername, initialAvatar, email }: Props) {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-extrabold text-slate-700 uppercase tracking-widest">Avatar URL</label>
-        <input 
-          type="url" 
-          required
-          value={avatar}
-          onChange={(e) => setAvatar(e.target.value)}
-          className="w-full p-4 rounded-2xl border-2 border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-400/20 outline-none transition-all font-medium text-slate-800"
-        />
+        <label className="text-sm font-extrabold text-slate-700 uppercase tracking-widest">Avatar Selection</label>
+        <div className="grid grid-cols-3 gap-4">
+          {["coder", "bot", "rocket", "pixel", "dev", "neon"].map((seed) => {
+            const seedUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`;
+            const isSelected = avatar === seedUrl;
+            return (
+              <button
+                key={seed}
+                type="button"
+                onClick={() => setAvatar(seedUrl)}
+                className={`relative w-full aspect-square rounded-2xl overflow-hidden border-4 transition-all ${
+                  isSelected ? "border-indigo-500 shadow-lg scale-105" : "border-slate-200 hover:border-indigo-300"
+                }`}
+              >
+                <Image src={seedUrl} alt={seed} fill unoptimized className="object-cover bg-slate-50" />
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {message && (

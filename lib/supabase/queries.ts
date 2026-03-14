@@ -68,6 +68,39 @@ export async function getCourseBySlug(slug: string): Promise<Course | null> {
   return course;
 }
 
+export async function getEnrolledCourseIds(userId: string): Promise<string[]> {
+  const supabase = createClient();
+  // Fetch distinct course_ids from user_progress
+  const { data, error } = await supabase
+    .from('user_progress')
+    .select('course_id')
+    .eq('user_id', userId);
+
+  if (error) {
+    console.error("Error fetching enrolled course IDs:", error.message);
+    return [];
+  }
+  
+  // Create unique set array of IDs
+  return Array.from(new Set(data.map(p => p.course_id)));
+}
+
+export async function getEnrolledCourses(userId: string): Promise<Course[]> {
+  const supabase = createClient();
+  // Join the courses table through the user_progress table
+  const { data: courses, error } = await supabase
+    .from('courses')
+    .select('*, user_progress!inner(user_id)')
+    .eq('user_progress.user_id', userId)
+    .order('title');
+
+  if (error) {
+    console.error("Error fetching enrolled courses:", error.message);
+    return [];
+  }
+  return courses || [];
+}
+
 export async function getTracks(courseId: string): Promise<Track[]> {
   const supabase = createClient();
   const { data: tracks, error } = await supabase

@@ -63,8 +63,9 @@ export function LeaderboardList({ players, currentUserId }: LeaderboardListProps
               <div className="relative w-12 h-12 rounded-full overflow-hidden bg-white border-2 border-slate-200 shrink-0">
                 <Image 
                   src={player.avatar_url || "https://api.dicebear.com/7.x/bottts/svg?seed=fallback"} 
-                  alt={player.username}
+                  alt={player.username || "Unknown"}
                   fill
+                  unoptimized
                   className="object-cover"
                 />
               </div>
