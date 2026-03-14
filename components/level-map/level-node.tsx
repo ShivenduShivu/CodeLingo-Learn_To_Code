@@ -40,7 +40,7 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
     <motion.div
       whileHover={!isLocked ? { scale: 1.1 } : {}}
       whileTap={!isLocked ? { scale: 0.95 } : {}}
-      className="relative group"
+      className="relative group flex flex-col items-center"
     >
       <div
         className={cn(
@@ -58,12 +58,14 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
         {state === "perfected" && <Crown className={cn("w-10 h-10 fill-current", iconColor)} />}
       </div>
 
-      {/* Floating Tooltip Label */}
-      <div className="absolute top-full mt-4 bg-card px-4 py-2 rounded-xl shadow-lg border-2 border-border text-sm font-bold text-foreground pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap left-1/2 -translate-x-1/2">
+      {/* Static Label Below Node */}
+      <div className="text-xs text-muted-foreground text-center mt-2 font-bold max-w-[120px]">
         {level.title}
-        <div className="text-xs text-muted-foreground font-medium mt-1 text-center">
-          {isLocked ? "Complete previous levels" : `${level.xp_reward} XP Reward`}
-        </div>
+      </div>
+
+      {/* Floating Tooltip Label */}
+      <div className="absolute top-full mt-8 bg-card px-3 py-1.5 rounded-lg shadow-md border-2 border-border text-xs font-bold text-foreground pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap left-1/2 -translate-x-1/2">
+        {isLocked ? "Complete previous level to unlock" : `${level.xp_reward} XP Reward`}
       </div>
     </motion.div>
   );

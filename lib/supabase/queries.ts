@@ -366,3 +366,70 @@ export async function getUserStats(userId: string): Promise<UserStats> {
     levelsCompleted: completedLevels || 0
   };
 }
+
+export type DailyStats = {
+  lessonsCompletedToday: number;
+  xpEarnedToday: number;
+};
+
+export async function getDailyStats(userId: string): Promise<DailyStats> {
+  const supabase = createClient();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayIso = today.toISOString();
+
+  const { data: levelProgresses, error } = await supabase
+    .from('level_progress')
+    .select('level_id, stars_earned, completed_at')
+    .eq('user_id', userId)
+    .gte('completed_at', todayIso);
+
+  if (error || !levelProgresses || levelProgresses.length === 0) {
+    return { lessonsCompletedToday: 0, xpEarnedToday: 0 };
+  }
+
+  const lessonsCompletedToday = levelProgresses.length;
+  const levelIds = levelProgresses.map((lp) => lp.level_id);
+  
+  const { data: levels } = await supabase
+    .from('levels')
+    .select('id, xp_reward')
+    .in('id', levelIds);
+
+  let xpEarnedToday = 0;
+  levelProgresses.forEach((lp) => {
+    const lDef = levels?.find(l => l.id === lp.level_id);
+    const reward = lDef?.xp_reward || 10;
+    const stars = lp.stars_earned || 0;
+    xpEarnedToday += reward + (stars * 5);
+  });
+
+  return { lessonsCompletedToday, xpEarnedToday };
+}
+
+export type Achievement = {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  xp_reward: number;
+};
+
+export async function getLatestAchievements(userId: string, limit = 3): Promise<Achievement[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('user_achievements')
+    .select('created_at, achievements!inner(*)')
+    .eq('user_id', userId)
+    // Order the junction table rows by newest first
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error || !data) {
+    console.error("Error fetching latest achievements:", error?.message);
+    return [];
+  }
+  
+  // @ts-expect-error Extract the inner joined achievement rows natively
+  return data.map((ua) => ua.achievements);
+}
