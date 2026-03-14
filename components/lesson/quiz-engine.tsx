@@ -5,6 +5,7 @@ import { type Question, type Answer } from "@/lib/supabase/queries";
 import { useLessonStore } from "@/lib/store/useLessonStore";
 import { ProgressBar } from "@/components/lesson/progress-bar";
 import { MultipleChoice } from "@/components/lesson/question-types/multiple-choice";
+import { CodeChallenge } from "@/components/lesson/question-types/code-challenge";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -27,6 +28,7 @@ export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, onComp
   const [isFinished, setIsFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [earnedData, setEarnedData] = useState<{ xp: number, stars: number, streak: number, achievements?: UnlockEvent[] } | null>(null);
+  const [userCodeAttempt, setUserCodeAttempt] = useState<string | undefined>(undefined);
   
   const { 
     currentQuestionIndex, 
@@ -141,8 +143,8 @@ export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, onComp
       {!isChecking && (
          <AIMentor 
            question={currentQuestion} 
-           currentAnswer={selectedAnswer ? answersForCurrentQ.find(a => a.id === selectedAnswer)?.answer_text : undefined} 
-           options={answersForCurrentQ.map(a => a.answer_text)}
+           currentAnswer={currentQuestion.question_type === 'code' ? userCodeAttempt : (selectedAnswer ? answersForCurrentQ.find(a => a.id === selectedAnswer)?.answer_text : undefined)} 
+           options={currentQuestion.question_type === 'code' ? [] : answersForCurrentQ.map(a => a.answer_text)}
            correctAnswer={answersForCurrentQ.find(a => a.is_correct)?.answer_text}
            lessonTitle={lessonTitle}
          />
@@ -177,8 +179,25 @@ export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, onComp
               />
             )}
             
+            {currentQuestion.question_type === 'code' && (
+              <CodeChallenge 
+                question={currentQuestion}
+                expectedOutput={answersForCurrentQ.find(a => a.is_correct)?.answer_text}
+                isChecking={isChecking}
+                onCorrect={(userCode) => {
+                  setUserCodeAttempt(userCode);
+                  checkAnswer(true);
+                }}
+                onIncorrect={(userCode) => {
+                  setUserCodeAttempt(userCode);
+                  checkAnswer(false);
+                  decrementHeart();
+                }}
+              />
+            )}
+
             {/* Future support for other types: */}
-            {currentQuestion.question_type !== 'multiple_choice' && (
+            {currentQuestion.question_type !== 'multiple_choice' && currentQuestion.question_type !== 'code' && (
               <div className="p-8 border-2 border-dashed border-border rounded-xl text-center">
                 Implementation for {currentQuestion.question_type} pending.
               </div>
@@ -187,29 +206,31 @@ export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, onComp
         </AnimatePresence>
       </main>
 
-      {/* Persistent Bottom Action Bar */}
-      {isChecking ? (
-        <FeedbackPanel isCorrect={!!isCorrect} onContinue={handleActionClick} />
-      ) : (
-        <div className="fixed bottom-0 left-0 right-0 border-t-2 border-border/50 bg-background/95 backdrop-blur-md p-4 z-40">
-          <div className="max-w-4xl mx-auto flex justify-between items-center">
-            <div className="text-muted-foreground hidden sm:block">Select an answer below</div>
-            
-            <Button 
-              className={cn(
-                "w-full sm:w-auto px-12 py-6 text-lg rounded-2xl border-b-4",
-                selectedAnswer 
-                  ? "bg-primary border-primary-foreground/20" 
-                  : "bg-muted text-muted-foreground border-transparent opacity-50 cursor-not-allowed hover:bg-muted"
-              )}
-              onClick={handleActionClick}
-              disabled={!selectedAnswer}
-            >
-              Check Answer
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Persistent Bottom Action Bar (Hidden for Code Challenges as they use their own Run Button) */}
+      {currentQuestion.question_type !== 'code' || isChecking ? (
+         isChecking ? (
+           <FeedbackPanel isCorrect={!!isCorrect} onContinue={handleActionClick} />
+         ) : (
+           <div className="fixed bottom-0 left-0 right-0 border-t-2 border-border/50 bg-background/95 backdrop-blur-md p-4 z-40">
+             <div className="max-w-4xl mx-auto flex justify-between items-center">
+               <div className="text-muted-foreground hidden sm:block">Select an answer below</div>
+               
+               <Button 
+                 className={cn(
+                   "w-full sm:w-auto px-12 py-6 text-lg rounded-2xl border-b-4",
+                   selectedAnswer 
+                     ? "bg-primary border-primary-foreground/20" 
+                     : "bg-muted text-muted-foreground border-transparent opacity-50 cursor-not-allowed hover:bg-muted"
+                 )}
+                 onClick={handleActionClick}
+                 disabled={!selectedAnswer}
+               >
+                 Check Answer
+               </Button>
+             </div>
+           </div>
+         )
+      ) : null}
     </div>
   );
 }

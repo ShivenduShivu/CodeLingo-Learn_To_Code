@@ -38,16 +38,37 @@ Limit your response to a maximum of 3 sentences.`;
     userPrompt += `Options given to student: [${options.join(", ")}]\n`;
   }
 
-  if (mode === "explain") {
-    userPrompt += `\nThe student clicked "Explain Concept". Please explain the programming rule or concept behind this question clearly.`;
-    if (correctAnswer) {
-      userPrompt += ` The correct answer is "${correctAnswer}", but focus on explaining the overarching concept instead of just pointing it out.`;
+  if (questionType === "code") {
+    if (mode === "explain") {
+       userPrompt += `\nThe student asked: "Explain what is wrong in this code".\n`;
+       if (userAnswer) {
+         userPrompt += `Student's Code Attempt:\n\`\`\`\n${userAnswer}\n\`\`\`\n`;
+       }
+       if (correctAnswer) {
+         userPrompt += `Expected Output snippet: "${correctAnswer}"\n`;
+       }
+       userPrompt += `\nPlease explain the conceptual error or syntax mistake in their code cleanly. Avoid giving them the completely corrected code blocks if possible.`;
+    } else {
+       // Hint Mode for Code
+       userPrompt += `\nThe student needs a hint for this coding challenge.`;
+       if (userAnswer) {
+         userPrompt += `\nThey wrote this code:\n\`\`\`\n${userAnswer}\n\`\`\`\n`;
+         userPrompt += `Gently point out one flaw or give them a tiny nudge in the right direction.`;
+       }
     }
   } else {
-    // Hint Mode
-    userPrompt += `\nThe student needs a hint.`;
-    if (userAnswer) {
-      userPrompt += ` They incorrectly guessed "${userAnswer}". Gently explain *why* that doesn't fit, then point them in the right direction without giving away the final answer.`;
+    // Standard Multiple Choice handling
+    if (mode === "explain") {
+      userPrompt += `\nThe student clicked "Explain Concept". Please explain the programming rule or concept behind this question clearly.`;
+      if (correctAnswer) {
+        userPrompt += ` The correct answer is "${correctAnswer}", but focus on explaining the overarching concept instead of just pointing it out.`;
+      }
+    } else {
+      // Hint Mode
+      userPrompt += `\nThe student needs a hint.`;
+      if (userAnswer) {
+        userPrompt += ` They incorrectly guessed "${userAnswer}". Gently explain *why* that doesn't fit, then point them in the right direction without giving away the final answer.`;
+      }
     }
   }
 
