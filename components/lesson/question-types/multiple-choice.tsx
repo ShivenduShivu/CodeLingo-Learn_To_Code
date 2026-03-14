@@ -29,9 +29,9 @@ export function MultipleChoice({ question, answers }: MultipleChoiceProps) {
              stateClass = "bg-primary/10 border-primary ring-2 ring-primary/20";
           } else if (isChecking) {
              if (answer.is_correct) {
-               stateClass = "bg-xp/20 border-xp text-xp-foreground ring-2 ring-xp/50";
+               stateClass = "bg-green-500 border-green-600 text-white shadow-md";
              } else if (isSelected && !answer.is_correct) {
-               stateClass = "bg-destructive/10 border-destructive text-destructive ring-2 ring-destructive/50 opacity-70";
+               stateClass = "bg-red-500 border-red-600 text-white opacity-90 shadow-md";
              } else {
                stateClass = "bg-card border-border opacity-50 cursor-not-allowed";
              }
@@ -51,14 +51,15 @@ export function MultipleChoice({ question, answers }: MultipleChoiceProps) {
               <div className="flex items-center gap-4">
                 <div 
                   className={cn(
-                    "flex-shrink-0 w-8 h-8 rounded-lg border-2 flex items-center justify-center font-bold text-sm transition-colors",
-                    isSelected ? "border-primary text-primary" : "border-muted-foreground/30 text-muted-foreground"
+                    "flex-shrink-0 w-8 h-8 rounded-lg border-2 flex items-center justify-center font-bold text-sm transition-colors bg-background",
+                    isSelected && !isChecking ? "border-primary text-primary" : "border-muted-foreground/30 text-muted-foreground"
                   )}
                 >
-                  {/* Generate letters A, B, C, D dynamically based on index if desired, here just a circle marker */}
                   <div className={cn(
                      "w-3 h-3 rounded-sm transition-all",
-                     isSelected ? "bg-primary scale-100" : "bg-transparent scale-0"
+                     isSelected && !isChecking ? "bg-primary scale-100" : "bg-transparent scale-0",
+                     isChecking && answer.is_correct && "bg-green-500 scale-100",
+                     isChecking && isSelected && !answer.is_correct && "bg-red-500 scale-100"
                   )} />
                 </div>
                 <span className="text-lg font-medium">{answer.answer_text}</span>

@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import type { UnlockEvent } from "@/lib/achievements/evaluator";
 import { AIMentor } from "@/components/lesson/ai-mentor";
 import { LessonComplete } from "@/components/lesson/lesson-complete";
+import { FeedbackPanel } from "@/components/lesson/feedback-panel";
 
 interface QuizEngineProps {
   questions: Question[];
@@ -143,7 +144,20 @@ export function QuizEngine({ questions, allAnswers, trackId, onComplete }: QuizE
          />
       )}
 
-      <main className="flex-1 flex flex-col justify-center px-4 md:px-8 max-w-4xl mx-auto w-full pt-12">
+      <main className="flex-1 flex flex-col justify-center px-4 md:px-8 max-w-4xl mx-auto w-full pt-12 relative">
+        <AnimatePresence>
+          {isChecking && isCorrect && (
+            <motion.div
+              initial={{ opacity: 0, y: 0, x: "-50%" }}
+              animate={{ opacity: [0, 1, 0], y: -30, x: "-50%" }}
+              transition={{ duration: 0.8 }}
+              className="absolute top-0 left-1/2 text-4xl font-black text-green-500 z-50 pointer-events-none drop-shadow-md"
+            >
+              +20 XP
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <AnimatePresence mode="wait">
           <motion.div
             key={currentQuestion.id} // Forces re-animation when question changes
@@ -170,30 +184,28 @@ export function QuizEngine({ questions, allAnswers, trackId, onComplete }: QuizE
       </main>
 
       {/* Persistent Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 border-t-2 border-border/50 bg-background/95 backdrop-blur-md p-4 z-40">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
-           {!isChecking && <div className="text-muted-foreground hidden sm:block">Select an answer below</div>}
-           {isChecking && isCorrect && <div className="text-xp font-bold text-xl hidden sm:block">Correct!</div>}
-           {isChecking && !isCorrect && <div className="text-destructive font-bold text-xl hidden sm:block">Incorrect.</div>}
+      {isChecking ? (
+        <FeedbackPanel isCorrect={!!isCorrect} onContinue={handleActionClick} />
+      ) : (
+        <div className="fixed bottom-0 left-0 right-0 border-t-2 border-border/50 bg-background/95 backdrop-blur-md p-4 z-40">
+          <div className="max-w-4xl mx-auto flex justify-between items-center">
+            <div className="text-muted-foreground hidden sm:block">Select an answer below</div>
             
-           <Button 
-             className={cn(
-               "w-full sm:w-auto px-12 py-6 text-lg rounded-2xl border-b-4",
-               isChecking 
-                 ? isCorrect 
-                    ? "bg-xp border-xp-foreground hover:bg-xp/90 text-xp-foreground" 
-                    : "bg-destructive border-destructive/80 hover:bg-destructive/90"
-                 : selectedAnswer 
-                    ? "bg-primary border-primary-foreground/20" 
-                    : "bg-muted text-muted-foreground border-transparent opacity-50 cursor-not-allowed hover:bg-muted"
-             )}
-             onClick={handleActionClick}
-             disabled={!selectedAnswer && !isChecking}
-           >
-             {isChecking ? "Continue" : "Check Answer"}
-           </Button>
+            <Button 
+              className={cn(
+                "w-full sm:w-auto px-12 py-6 text-lg rounded-2xl border-b-4",
+                selectedAnswer 
+                  ? "bg-primary border-primary-foreground/20" 
+                  : "bg-muted text-muted-foreground border-transparent opacity-50 cursor-not-allowed hover:bg-muted"
+              )}
+              onClick={handleActionClick}
+              disabled={!selectedAnswer}
+            >
+              Check Answer
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

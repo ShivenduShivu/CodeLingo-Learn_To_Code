@@ -419,16 +419,18 @@ export async function getLatestAchievements(userId: string, limit = 3): Promise<
   const supabase = createClient();
   const { data, error } = await supabase
     .from('user_achievements')
-    .select('created_at, achievements!inner(*)')
+    .select('unlocked_at, achievements!inner(*)')
     .eq('user_id', userId)
     // Order the junction table rows by newest first
-    .order('created_at', { ascending: false })
+    .order('unlocked_at', { ascending: false })
     .limit(limit);
 
-  if (error || !data) {
-    console.error("Error fetching latest achievements:", error?.message);
+  if (error) {
+    console.warn("Achievements query failed:", error.message);
     return [];
   }
+  
+  if (!data) return [];
   
   // @ts-expect-error Extract the inner joined achievement rows natively
   return data.map((ua) => ua.achievements);
