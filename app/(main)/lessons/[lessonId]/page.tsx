@@ -10,9 +10,13 @@ interface LessonPageProps {
   params: {
     lessonId: string;
   };
+  searchParams?: {
+    practice?: string;
+  };
 }
 
-export default async function LessonPage({ params }: LessonPageProps) {
+export default async function LessonPage({ params, searchParams }: LessonPageProps) {
+  const isPractice = searchParams?.practice === "true";
   // We need to resolve the trackId to safely return the user to the map on exit
   const supabase = createClient();
   const { data: lessonMeta } = await supabase
@@ -47,10 +51,11 @@ export default async function LessonPage({ params }: LessonPageProps) {
       questions={questions} 
       allAnswers={answersRecord}
       trackId={trackId}
+      practiceMode={isPractice}
       lessonTitle={lessonMeta.title}
       onComplete={async (correctCount, total) => {
         "use server";
-        return await completeLevel(lessonMeta.level_id, correctCount, total);
+        return await completeLevel(lessonMeta.level_id, correctCount, total, isPractice);
       }}
     />
   );

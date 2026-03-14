@@ -17,7 +17,8 @@ export async function generateHintStream(
   options?: string[],
   correctAnswer?: string,
   lessonTitle?: string,
-  mode: "hint" | "explain" = "hint"
+  mode: "hint" | "explain" = "hint",
+  isWeakLesson: boolean = false
 ) {
   const systemPrompt = `You are a friendly programming mentor helping beginners learn coding.
 
@@ -70,6 +71,10 @@ Limit your response to a maximum of 3 sentences.`;
         userPrompt += ` They incorrectly guessed "${userAnswer}". Gently explain *why* that doesn't fit, then point them in the right direction without giving away the final answer.`;
       }
     }
+  }
+
+  if (isWeakLesson) {
+    userPrompt += `\nNOTE: The student struggled with this topic multiple times. Please explain the concept clearly with a very simple, relatable example.`;
   }
 
   try {

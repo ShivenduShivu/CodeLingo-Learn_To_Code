@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCompletion } from "@ai-sdk/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Sparkles, X, MessageSquare, Loader2 } from "lucide-react";
+import { isLessonWeak } from "@/lib/utils/practice-detector";
 import type { Question } from "@/lib/supabase/queries";
 
 interface AIMentorProps {
@@ -19,6 +20,11 @@ export function AIMentor({ question, currentAnswer, options, correctAnswer, less
   const [isOpen, setIsOpen] = useState(false);
   const [hintsRemaining, setHintsRemaining] = useState<number | null>(null);
   const [explainsRemaining, setExplainsRemaining] = useState<number | null>(null);
+  const [isWeak, setIsWeak] = useState(false);
+
+  useEffect(() => {
+    setIsWeak(isLessonWeak(question.lesson_id));
+  }, [question.lesson_id]);
 
   const { completion, complete, isLoading, error } = useCompletion({
     api: "/api/ai/hint",
@@ -46,7 +52,8 @@ export function AIMentor({ question, currentAnswer, options, correctAnswer, less
         correctAnswer,
         lessonTitle,
         lessonId: question.lesson_id,
-        mode
+        mode,
+        isWeakLesson: isWeak
       }
     });
   };

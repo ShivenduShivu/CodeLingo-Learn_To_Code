@@ -28,7 +28,8 @@ export async function POST(req: Request) {
        correctAnswer, 
        lessonTitle, 
        lessonId,
-       mode = "hint"
+       mode = "hint",
+       isWeakLesson = false
     } = body;
 
     if (!questionText || !lessonId) {
@@ -76,7 +77,8 @@ export async function POST(req: Request) {
       options,
       correctAnswer,
       lessonTitle,
-      mode
+      mode,
+      isWeakLesson
     );
     
     // Convert to a stream response, injecting the safe headers so the UI can parse remaining counts

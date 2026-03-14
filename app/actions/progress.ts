@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { checkAchievements } from "@/lib/achievements/evaluator";
 import { revalidatePath } from "next/cache";
 
-export async function completeLevel(levelId: string, correctCount: number, totalQuestions: number) {
+export async function completeLevel(levelId: string, correctCount: number, totalQuestions: number, isPractice: boolean = false) {
   const supabase = createClient();
   
   // 1. Get authenticated user
@@ -37,7 +37,10 @@ export async function completeLevel(levelId: string, correctCount: number, total
   else if (accuracy >= 0.5) stars = 1;
   else stars = 0;
 
-  const xpEarned = xpReward + (stars * 5);
+  let xpEarned = xpReward + (stars * 5);
+  if (isPractice) {
+    xpEarned += 10;
+  }
 
   // 4. Update Level Progress (UPSERT)
   const { error: lpError } = await supabase

@@ -14,16 +14,18 @@ import type { UnlockEvent } from "@/lib/achievements/evaluator";
 import { AIMentor } from "@/components/lesson/ai-mentor";
 import { LessonComplete } from "@/components/lesson/lesson-complete";
 import { FeedbackPanel } from "@/components/lesson/feedback-panel";
+import { recordIncorrectAttempt, clearWeakLesson } from "@/lib/utils/practice-detector";
 
 interface QuizEngineProps {
   questions: Question[];
   allAnswers: Record<string, Answer[]>;
   trackId: string;
   lessonTitle: string;
+  practiceMode?: boolean;
   onComplete: (correctCount: number, totalQuestions: number) => Promise<{ success: boolean; earnedXp?: number; stars?: number; newStreak?: number; newAchievements?: UnlockEvent[]; error?: string }>;
 }
 
-export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, onComplete }: QuizEngineProps) {
+export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, practiceMode, onComplete }: QuizEngineProps) {
   const router = useRouter();
   const [isFinished, setIsFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -65,6 +67,9 @@ export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, onComp
         try {
           const res = await onComplete(correctAnswers, questions.length);
           if (res.success) {
+            if (practiceMode && questions.length > 0) {
+               clearWeakLesson(questions[0].lesson_id);
+            }
             const successData = res as { success: true; earnedXp: number; stars: number; newStreak: number; newAchievements?: UnlockEvent[] };
             setEarnedData({ xp: successData.earnedXp, stars: successData.stars, streak: successData.newStreak, achievements: successData.newAchievements });
           } else {
@@ -95,6 +100,7 @@ export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, onComp
         checkAnswer(answered.is_correct);
         if (!answered.is_correct) {
           decrementHeart();
+          recordIncorrectAttempt(currentQuestion.lesson_id, lessonTitle);
         }
       }
     }
@@ -192,6 +198,7 @@ export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, onComp
                   setUserCodeAttempt(userCode);
                   checkAnswer(false);
                   decrementHeart();
+                  recordIncorrectAttempt(currentQuestion.lesson_id, lessonTitle);
                 }}
               />
             )}

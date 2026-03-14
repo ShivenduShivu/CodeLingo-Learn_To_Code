@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CourseList } from "@/components/course/course-list";
 import { AchievementPanel } from "@/components/gamification/achievement-panel";
+import { PracticeCard } from "@/components/dashboard/practice-card";
 import type { Course, CourseProgressSummary, UserStats, DailyStats, Achievement } from "@/lib/supabase/queries";
 
 const containerVariants = {
@@ -99,9 +100,10 @@ export function DashboardContent({
         </div>
       </motion.div>
 
-      {/* 3. ACHIEVEMENTS */}
+      {/* 3. ACHIEVEMENTS & PRACTICE */}
       <motion.div variants={itemVariants}>
         <AchievementPanel achievements={achievements} />
+        <PracticeCard />
       </motion.div>
 
       {/* 4. COURSE LIST */}
