@@ -1,4 +1,5 @@
 import { createClient } from './server'
+import { calculateStreak } from '@/lib/utils/streak'
 
 export type Course = {
   id: string;
@@ -317,4 +318,51 @@ export async function getCourseProgressMap(userId: string): Promise<Record<strin
   }));
 
   return map;
+}
+
+export type UserStats = {
+  totalXp: number;
+  streak: number;
+  levelsCompleted: number;
+};
+
+export async function getUserStats(userId: string): Promise<UserStats> {
+  const supabase = createClient();
+
+  // 1. Total XP from users table
+  const { data: userData } = await supabase
+    .from('users')
+    .select('total_xp')
+    .eq('id', userId)
+    .maybeSingle();
+
+  const totalXp = userData?.total_xp || 0;
+
+  // 2. Levels Completed
+  const { count: completedLevels } = await supabase
+    .from('level_progress')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId);
+
+  // 3. Streak
+  const { data: progresses } = await supabase
+    .from('user_progress')
+    .select('streak_count, last_activity')
+    .eq('user_id', userId);
+
+  let maxStreak = 0;
+  if (progresses && progresses.length > 0) {
+    for (const p of progresses) {
+      const activeStreak = calculateStreak(p.last_activity, p.streak_count || 0);
+      if (activeStreak > maxStreak) {
+        maxStreak = activeStreak;
+      }
+    }
+  }
+
+  return {
+    totalXp,
+    streak: maxStreak,
+    levelsCompleted: completedLevels || 0
+  };
 }

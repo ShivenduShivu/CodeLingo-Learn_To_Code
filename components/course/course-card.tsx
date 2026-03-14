@@ -44,19 +44,24 @@ export function CourseCard({ course, isEnrolled, progressSummary }: CourseCardPr
         ) : (
           <div className="mt-auto space-y-4">
             {progressSummary && (
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                  <span className="truncate mr-2">{progressSummary.track_title}</span>
-                  <span className="text-xp whitespace-nowrap">{progressSummary.xpEarned} XP</span>
-                </div>
-                <div className="h-2.5 w-full bg-secondary rounded-full overflow-hidden">
+              <div className="space-y-3">
+                <div className="h-3 w-full bg-secondary rounded-full overflow-hidden">
                   <div 
                     className="h-full transition-all duration-500 ease-out rounded-full"
                     style={{ width: `${progressPercent}%`, backgroundColor: course.color_hex }}
                   />
                 </div>
-                <div className="text-right text-xs text-muted-foreground font-medium">
-                  {progressPercent}% Complete
+                
+                <div className="grid grid-cols-2 gap-y-1 text-xs font-medium text-muted-foreground">
+                  <div>
+                    <span className="text-foreground font-bold">{progressSummary.completedLevels} / {progressSummary.totalLevels}</span> Levels
+                  </div>
+                  <div className="text-right text-xp font-bold">
+                    {progressSummary.xpEarned} XP Earned
+                  </div>
+                  <div className="col-span-2 truncate mt-1">
+                    Track: <span className="text-foreground font-bold">{progressSummary.track_title}</span>
+                  </div>
                 </div>
               </div>
             )}

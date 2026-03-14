@@ -33,17 +33,47 @@ export function LessonComplete({ xp, stars, streak, achievements, trackId }: Les
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-3 gap-4 mt-8"
         >
-          <div className="bg-card border-2 border-border border-b-4 rounded-xl p-4">
+          <div className="bg-card border-2 border-border border-b-4 rounded-xl p-4 flex flex-col items-center justify-center">
             <div className="text-muted-foreground text-sm font-bold uppercase mb-1">XP</div>
-            <div className="text-xp font-black text-2xl">+{xp}</div>
+            <motion.div 
+              initial={{ scale: 0.5, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+              className="text-xp font-black text-2xl h-8 flex items-center"
+            >
+              +{xp}
+            </motion.div>
           </div>
-          <div className="bg-card border-2 border-border border-b-4 rounded-xl p-4">
+          <div className="bg-card border-2 border-border border-b-4 rounded-xl p-4 flex flex-col items-center justify-center">
             <div className="text-muted-foreground text-sm font-bold uppercase mb-1">Stars</div>
-            <div className="text-primary font-black text-2xl">+{stars}</div>
+            <div className="flex gap-1 h-8 items-center justify-center">
+              {stars > 0 ? (
+                Array.from({ length: stars }).map((_, i) => (
+                  <motion.span
+                    key={i}
+                    initial={{ scale: 0, opacity: 0, y: 10 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    transition={{ type: "spring", stiffness: 200, delay: 0.2 + (i * 0.2) }}
+                    className="text-2xl"
+                  >
+                    ⭐
+                  </motion.span>
+                ))
+              ) : (
+                <span className="text-muted-foreground text-lg font-bold">0</span>
+              )}
+            </div>
           </div>
-          <div className="bg-card border-2 border-border border-b-4 rounded-xl p-4">
+          <div className="bg-card border-2 border-border border-b-4 rounded-xl p-4 flex flex-col items-center justify-center">
             <div className="text-muted-foreground text-sm font-bold uppercase mb-1">Streak</div>
-            <div className="text-orange-500 font-black text-2xl">{streak}🔥</div>
+            <motion.div 
+              initial={{ scale: 0.5, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 200, delay: 0.8 }}
+              className="text-orange-500 font-black text-2xl h-8 flex items-center"
+            >
+              {streak}🔥
+            </motion.div>
           </div>
         </motion.div>
 

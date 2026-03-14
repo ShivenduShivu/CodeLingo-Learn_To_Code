@@ -15,9 +15,8 @@ interface LevelNodeProps {
 }
 
 export function LevelNode({ level, state, index }: LevelNodeProps) {
-  // Classic Duolingo sine wave offset for vertical visual pacing
-  const offsets = [0, 40, 60, 40, 0, -40, -60, -40];
-  const offset = offsets[index % offsets.length];
+  const alignments = ["self-center", "self-start", "self-end", "self-start"];
+  const alignment = alignments[index % alignments.length];
 
   const isLocked = state === "locked";
   const isUnlocked = state === "unlocked";
@@ -37,50 +36,48 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
     iconColor = "text-white";
   }
 
-  const NodeContent = (
-    <div
-      className="relative flex justify-center w-full my-8 group"
-      style={{ transform: `translateX(${offset}px)` }}
+  const NodeInner = (
+    <motion.div
+      whileHover={!isLocked ? { scale: 1.1 } : {}}
+      whileTap={!isLocked ? { scale: 0.95 } : {}}
+      className="relative group"
     >
-      <motion.div
-        whileHover={!isLocked ? { scale: 1.1 } : {}}
-        whileTap={!isLocked ? { scale: 0.95 } : {}}
+      <div
+        className={cn(
+          "relative z-10 w-24 h-24 rounded-full flex flex-col items-center justify-center border-b-8 transition-shadow",
+          bgColor,
+          borderColor,
+          isLocked && "opacity-80 cursor-not-allowed",
+          isUnlocked && "hover:shadow-2xl shadow-primary/40 ring-4 ring-primary/20",
+          !isLocked && "cursor-pointer"
+        )}
       >
-        <div
-          className={cn(
-            "relative z-10 w-20 h-20 rounded-full flex flex-col items-center justify-center border-b-8 transition-shadow",
-            bgColor,
-            borderColor,
-            isLocked && "opacity-80 cursor-not-allowed",
-            isUnlocked && "hover:shadow-2xl shadow-primary/40 ring-4 ring-primary/20",
-            !isLocked && "cursor-pointer"
-          )}
-        >
-          {state === "locked" && <Lock className={cn("w-8 h-8", iconColor)} />}
-          {state === "unlocked" && <Star className={cn("w-8 h-8 fill-current", iconColor)} />}
-          {state === "completed" && <Check className={cn("w-8 h-8", iconColor, "font-extrabold")} />}
-          {state === "perfected" && <Crown className={cn("w-8 h-8 fill-current", iconColor)} />}
-        </div>
-      </motion.div>
+        {state === "locked" && <Lock className={cn("w-10 h-10", iconColor)} />}
+        {state === "unlocked" && <Star className={cn("w-10 h-10 fill-current", iconColor)} />}
+        {state === "completed" && <Check className={cn("w-10 h-10", iconColor, "font-extrabold")} />}
+        {state === "perfected" && <Crown className={cn("w-10 h-10 fill-current", iconColor)} />}
+      </div>
 
       {/* Floating Tooltip Label */}
-      <div className="absolute top-full mt-4 bg-card px-4 py-2 rounded-xl shadow-lg border-2 border-border text-sm font-bold text-foreground pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-20 whitespace-nowrap">
+      <div className="absolute top-full mt-4 bg-card px-4 py-2 rounded-xl shadow-lg border-2 border-border text-sm font-bold text-foreground pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap left-1/2 -translate-x-1/2">
         {level.title}
-        <div className="text-xs text-muted-foreground font-medium mt-1">
-          {isLocked ? "Complete previous levels to unlock" : `${level.xp_reward} XP Reward`}
+        <div className="text-xs text-muted-foreground font-medium mt-1 text-center">
+          {isLocked ? "Complete previous levels" : `${level.xp_reward} XP Reward`}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 
+  const wrapperClass = cn("relative flex justify-center my-6 w-fit z-10", alignment);
+
   if (isLocked) {
-    return NodeContent;
+    return <div className={wrapperClass}>{NodeInner}</div>;
   }
 
   // If unlocked or completed, make it a clickable Link to the actual lesson
   return (
-    <Link href={`/levels/${level.id}`} className="block w-full">
-      {NodeContent}
+    <Link href={`/levels/${level.id}`} className={wrapperClass}>
+      {NodeInner}
     </Link>
   );
 }
