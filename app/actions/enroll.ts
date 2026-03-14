@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function enroll(courseId: string) {
@@ -10,6 +11,7 @@ export async function enroll(courseId: string) {
   if (!user) {
     return { error: "Unauthorized" };
   }
+  console.log("Enroll action triggered for course:", courseId);
 
   // 1. Fetch the primary (first) track of the course to initialize progress correctly
   const { data: track, error: trackError } = await supabase
@@ -39,11 +41,14 @@ export async function enroll(courseId: string) {
   if (insertError) {
     // If it's a unique constraint violation, they are already enrolled anyway, so just silently redirect.
     if (insertError.code === '23505') {
-       redirect("/dashboard");
+       redirect(`/tracks/${track.id}`);
     }
     return { error: insertError.message };
   }
 
-  // 3. Redirect back to dashboard to start playing
-  redirect("/dashboard");
+  // 3. Invalidate caches and redirect back to track map to start playing
+  revalidatePath("/dashboard");
+  revalidatePath("/courses");
+  console.log("Redirecting to track:", track.id);
+  redirect(`/tracks/${track.id}`);
 }

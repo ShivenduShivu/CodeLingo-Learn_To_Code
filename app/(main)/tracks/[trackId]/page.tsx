@@ -1,4 +1,4 @@
-import { getLevels, getUserProgress } from "@/lib/supabase/queries";
+import { getLevels } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { MapContainer } from "@/components/level-map/map-container";
@@ -26,19 +26,25 @@ export default async function TrackPage({ params }: TrackPageProps) {
   let currentLevelNumber = 1;
 
   if (user) {
-    // Find the course_id for this track to lookup progress correctly
-    const { data: track } = await supabase
-      .from('tracks')
-      .select('course_id')
-      .eq('id', params.trackId)
-      .single();
+    // A level is unlocked when the previous level exists in level_progress
+    const levelIds = levels.map((l) => l.id);
+    const { data: completedLevels } = await supabase
+      .from('level_progress')
+      .select('level_id')
+      .eq('user_id', user.id)
+      .in('level_id', levelIds);
 
-    if (track) {
-      const progress = await getUserProgress(user.id, track.course_id);
-      if (progress) {
-         currentLevelNumber = progress.current_level;
+    const completedLevelIds = new Set(completedLevels?.map((cl) => cl.level_id) || []);
+
+    let highestUnlocked = 1;
+
+    for (const level of levels) {
+      if (completedLevelIds.has(level.id)) {
+        highestUnlocked = Math.max(highestUnlocked, level.level_number + 1);
       }
     }
+
+    currentLevelNumber = highestUnlocked;
   }
 
   return (
