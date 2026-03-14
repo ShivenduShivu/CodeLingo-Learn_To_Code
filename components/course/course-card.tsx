@@ -12,9 +12,7 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, isEnrolled, progressSummary }: CourseCardProps) {
-  const progressPercent = progressSummary && progressSummary.total_levels > 0 
-    ? Math.min(Math.round((progressSummary.completed_levels / progressSummary.total_levels) * 100), 100) 
-    : 0;
+  const progressPercent = progressSummary?.progressPercent || 0;
 
   const CardContent = (
     <>
@@ -49,7 +47,7 @@ export function CourseCard({ course, isEnrolled, progressSummary }: CourseCardPr
               <div className="space-y-2">
                 <div className="flex justify-between items-center text-xs font-bold text-muted-foreground uppercase tracking-wider">
                   <span className="truncate mr-2">{progressSummary.track_title}</span>
-                  <span className="text-xp whitespace-nowrap">{progressSummary.total_xp} XP</span>
+                  <span className="text-xp whitespace-nowrap">{progressSummary.xpEarned} XP</span>
                 </div>
                 <div className="h-2.5 w-full bg-secondary rounded-full overflow-hidden">
                   <div 
