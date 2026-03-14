@@ -23,6 +23,9 @@
 # debug
 *.log
 /dist
+eslint_out.*
+eslint_output.*
+knip_result.*
 
 # local env files
 .env*.local

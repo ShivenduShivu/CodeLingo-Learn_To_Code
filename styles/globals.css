@@ -1,16 +1,17 @@
 @tailwind base;
-@import './theme.css';
 @tailwind components;
 @tailwind utilities;
+@import './theme.css';
 
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground font-sans;
   }
-  
+
   /* Additional global utilities for premium game feel */
   button {
     @apply active:scale-[0.98] transition-all;
