@@ -22,7 +22,7 @@ export function AchievementPanel({ achievements }: { achievements: Achievement[]
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-card border-2 border-border border-b-4 rounded-xl p-4 flex flex-col items-center justify-center text-center space-y-2 hover:-translate-y-1 hover:shadow-lg transition-all"
+            className="bg-card border-2 border-border border-b-4 rounded-xl p-4 flex flex-col items-center justify-center text-center space-y-2 hover:scale-[1.03] hover:shadow-lg transition-all duration-200 cursor-pointer"
           >
             <div className="text-4xl bg-muted/30 p-3 rounded-full">{ach.icon || "🏆"}</div>
             <div className="font-bold text-foreground">{ach.name}</div>

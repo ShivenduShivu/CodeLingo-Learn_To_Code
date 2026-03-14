@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import { generateHintStream } from '@/lib/ai/hints';
 import { createClient } from '@/lib/supabase/server';
 
-// Extremely basic in-memory rate limiting mechanism (By UserId)
+// Extremely basic in-memory rate limiting mechanism (By UserId + LessonId)
 // In a true massively-scaled production app this would use Redis/Upstash.
-const rateLimitStore = new Map<string, { count: number, resetAt: number }>();
-const HINTS_PER_SESSION = 3;
-const SESSION_DURATION_MS = 1000 * 60 * 60; // 1 Hour
+const rateLimitStore = new Map<string, { hints: number, explains: number, resetAt: number }>();
+const HINTS_PER_LESSON = 2;
+const EXPLAINS_PER_LESSON = 1;
+const SESSION_DURATION_MS = 1000 * 60 * 60 * 2; // 2 Hours
 
 export async function POST(req: Request) {
   try {
@@ -17,45 +18,72 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // 2. Parse Minimal Context Request
+    const body = await req.json();
+    const { 
+       prompt: questionText, 
+       questionType, 
+       userAnswer, 
+       options, 
+       correctAnswer, 
+       lessonTitle, 
+       lessonId,
+       mode = "hint"
+    } = body;
+
+    if (!questionText || !lessonId) {
+      return NextResponse.json({ error: 'Missing required question syntax or lesson scope.' }, { status: 400 });
+    }
+
     // 1. Enforce Rate Limiting Server-Side
     const now = Date.now();
-    let userLimit = rateLimitStore.get(user.id);
+    const limitKey = `${user.id}:${lessonId}`;
+    let userLimit = rateLimitStore.get(limitKey);
 
     if (userLimit && now > userLimit.resetAt) {
       userLimit = undefined; // Expire it
     }
 
     if (!userLimit) {
-      userLimit = { count: 0, resetAt: now + SESSION_DURATION_MS };
+      userLimit = { hints: 0, explains: 0, resetAt: now + SESSION_DURATION_MS };
     }
 
-    if (userLimit.count >= HINTS_PER_SESSION) {
+    if (mode === "explain" && userLimit.explains >= EXPLAINS_PER_LESSON) {
       return NextResponse.json(
-        { error: 'Rate limit exceeded. Try again in an hour!' }, 
+        { error: 'Explanation limit exceeded for this lesson.' }, 
+        { status: 429 }
+      );
+    } else if (mode === "hint" && userLimit.hints >= HINTS_PER_LESSON) {
+      return NextResponse.json(
+        { error: 'Hint limit exceeded for this lesson.' }, 
         { status: 429 }
       );
     }
 
-    // 2. Parse Minimal Context Request
-    const body = await req.json();
-    const { prompt: questionText, questionType, userAnswer } = body;
-
-    // Vercel AI SDK 'useCompletion' sends 'prompt' as the variable by default
-    if (!questionText) {
-      return NextResponse.json({ error: 'Missing required question context.' }, { status: 400 });
+    // Increment Usage only when we successfully validate expectations
+    if (mode === "explain") {
+       userLimit.explains += 1;
+    } else {
+       userLimit.hints += 1;
     }
-
-    // Increment Usage only when we successfully validate
-    userLimit.count += 1;
-    rateLimitStore.set(user.id, userLimit);
+    rateLimitStore.set(limitKey, userLimit);
 
     // 3. Trigger generic AI Service helper for a Streaming Text response
-    const result = await generateHintStream(questionText, questionType || 'multiple_choice', userAnswer);
+    const result = await generateHintStream(
+      questionText, 
+      questionType || 'multiple_choice', 
+      userAnswer,
+      options,
+      correctAnswer,
+      lessonTitle,
+      mode
+    );
     
     // Convert to a stream response, injecting the safe headers so the UI can parse remaining counts
     return result.toTextStreamResponse({
        headers: {
-          'x-hints-remaining': String(HINTS_PER_SESSION - userLimit.count)
+          'x-hints-remaining': String(HINTS_PER_LESSON - userLimit.hints),
+          'x-explains-remaining': String(EXPLAINS_PER_LESSON - userLimit.explains)
        }
     });
 

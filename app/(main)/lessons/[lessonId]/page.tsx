@@ -47,6 +47,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
       questions={questions} 
       allAnswers={answersRecord}
       trackId={trackId}
+      lessonTitle={lessonMeta.title}
       onComplete={async (correctCount, total) => {
         "use server";
         return await completeLevel(lessonMeta.level_id, correctCount, total);

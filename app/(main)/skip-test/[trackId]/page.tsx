@@ -70,6 +70,7 @@ export default async function SkipTestPage({ params }: SkipTestPageProps) {
       questions={examQuestions} 
       allAnswers={answersRecord}
       trackId={trackId}
+      lessonTitle="Placement Test"
       onComplete={async (correctCount, total) => {
         "use server";
         return await skipTrack(trackId, correctCount, total);

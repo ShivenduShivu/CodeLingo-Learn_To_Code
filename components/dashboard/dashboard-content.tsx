@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CourseList } from "@/components/course/course-list";
 import { AchievementPanel } from "@/components/gamification/achievement-panel";
@@ -49,27 +48,14 @@ export function DashboardContent({
       animate="show"
       className="max-w-6xl mx-auto p-6 md:p-12 space-y-10"
     >
-      {/* 1. HERO CARD */}
-      <motion.div 
-        variants={itemVariants} 
-        className="rounded-2xl bg-gradient-to-r from-emerald-50 to-green-100 border shadow-md p-8 mb-6 flex items-center justify-between"
-      >
-        <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-            What would you like to learn today?
-          </h1>
-          <p className="text-muted-foreground text-lg mt-2 font-medium">
-            Continue your coding journey and keep your streak alive.
-          </p>
-        </div>
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.4 }}
-          className="hidden md:flex bg-white/50 p-4 rounded-full shadow-sm"
-        >
-          <Rocket className="w-12 h-12 text-emerald-600" />
-        </motion.div>
+      {/* 1. HERO TEXT */}
+      <motion.div variants={itemVariants}>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          What would you like to learn today?
+        </h1>
+        <p className="text-muted-foreground text-lg mt-2 font-medium">
+          Continue your coding journey and keep your streak alive.
+        </p>
       </motion.div>
 
       {/* 2. STATS OVERVIEW */}

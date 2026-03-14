@@ -18,10 +18,11 @@ interface QuizEngineProps {
   questions: Question[];
   allAnswers: Record<string, Answer[]>;
   trackId: string;
+  lessonTitle: string;
   onComplete: (correctCount: number, totalQuestions: number) => Promise<{ success: boolean; earnedXp?: number; stars?: number; newStreak?: number; newAchievements?: UnlockEvent[]; error?: string }>;
 }
 
-export function QuizEngine({ questions, allAnswers, trackId, onComplete }: QuizEngineProps) {
+export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, onComplete }: QuizEngineProps) {
   const router = useRouter();
   const [isFinished, setIsFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -141,6 +142,9 @@ export function QuizEngine({ questions, allAnswers, trackId, onComplete }: QuizE
          <AIMentor 
            question={currentQuestion} 
            currentAnswer={selectedAnswer ? answersForCurrentQ.find(a => a.id === selectedAnswer)?.answer_text : undefined} 
+           options={answersForCurrentQ.map(a => a.answer_text)}
+           correctAnswer={answersForCurrentQ.find(a => a.is_correct)?.answer_text}
+           lessonTitle={lessonTitle}
          />
       )}
 

@@ -13,19 +13,42 @@ import { google } from "@ai-sdk/google";
 export async function generateHintStream(
   questionText: string,
   questionType: string,
-  userAnswer?: string
+  userAnswer?: string,
+  options?: string[],
+  correctAnswer?: string,
+  lessonTitle?: string,
+  mode: "hint" | "explain" = "hint"
 ) {
-  const systemPrompt = `You are an educational tutor in a gamified learning app.
-Provide a hint that helps the student reason toward the answer, but do not reveal the final answer.
-CRITICAL RULES:
-1. NEVER give the user the final answer directly.
-2. Keep your hint extremely concise (1-3 sentences max). This is a fast-paced quiz.
-3. If the user guessed a specific wrong answer, gently explain *why* that concept doesn't fit here, then point them in the right direction.
-4. Use an encouraging, conversational tone. Emojis are welcome.`;
+  const systemPrompt = `You are a friendly programming mentor helping beginners learn coding.
 
-  let userPrompt = `I need a hint for this ${questionType} question:\n"${questionText}"`;
-  if (userAnswer) {
-    userPrompt += `\nI guessed "${userAnswer}", but it was wrong.`;
+Do NOT reveal the correct answer directly.
+
+Instead:
+- explain the concept
+- guide the student toward the right reasoning
+- use simple beginner-friendly language
+
+Limit your response to a maximum of 3 sentences.`;
+
+  let userPrompt = `Context: The student is learning "${lessonTitle || 'ProgrammingConcepts'}".\n`;
+  userPrompt += `Question Type: ${questionType}\n`;
+  userPrompt += `Question: "${questionText}"\n`;
+
+  if (options && options.length > 0) {
+    userPrompt += `Options given to student: [${options.join(", ")}]\n`;
+  }
+
+  if (mode === "explain") {
+    userPrompt += `\nThe student clicked "Explain Concept". Please explain the programming rule or concept behind this question clearly.`;
+    if (correctAnswer) {
+      userPrompt += ` The correct answer is "${correctAnswer}", but focus on explaining the overarching concept instead of just pointing it out.`;
+    }
+  } else {
+    // Hint Mode
+    userPrompt += `\nThe student needs a hint.`;
+    if (userAnswer) {
+      userPrompt += ` They incorrectly guessed "${userAnswer}". Gently explain *why* that doesn't fit, then point them in the right direction without giving away the final answer.`;
+    }
   }
 
   try {

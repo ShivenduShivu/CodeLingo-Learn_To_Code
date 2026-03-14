@@ -10,11 +10,15 @@ import type { Question } from "@/lib/supabase/queries";
 interface AIMentorProps {
   question: Question;
   currentAnswer?: string;
+  options: string[];
+  correctAnswer?: string;
+  lessonTitle: string;
 }
 
-export function AIMentor({ question, currentAnswer }: AIMentorProps) {
+export function AIMentor({ question, currentAnswer, options, correctAnswer, lessonTitle }: AIMentorProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [remaining, setRemaining] = useState<number | null>(null);
+  const [hintsRemaining, setHintsRemaining] = useState<number | null>(null);
+  const [explainsRemaining, setExplainsRemaining] = useState<number | null>(null);
 
   const { completion, complete, isLoading, error } = useCompletion({
     api: "/api/ai/hint",
@@ -22,10 +26,10 @@ export function AIMentor({ question, currentAnswer }: AIMentorProps) {
     fetch: async (url, options) => {
       const res = await fetch(url, options);
       // Parse our secure rate-limit metadata from the streaming response headers
-      const remainingHeader = res.headers.get("x-hints-remaining");
-      if (remainingHeader) {
-        setRemaining(parseInt(remainingHeader, 10));
-      }
+      const hintsHeader = res.headers.get("x-hints-remaining");
+      const explainsHeader = res.headers.get("x-explains-remaining");
+      if (hintsHeader) setHintsRemaining(parseInt(hintsHeader, 10));
+      if (explainsHeader) setExplainsRemaining(parseInt(explainsHeader, 10));
       return res;
     },
     onError: (err: Error) => {
@@ -33,21 +37,24 @@ export function AIMentor({ question, currentAnswer }: AIMentorProps) {
     }
   });
 
-  const requestHint = () => {
-    // Vercel AI SDK 'useCompletion' passes the string down as 'prompt' natively
-    complete(question.question_text, {
+  const requestHint = (mode: "hint" | "explain" = "hint") => {
+      complete(question.question_text, {
       body: {
         questionType: question.question_type,
-        userAnswer: currentAnswer
+        userAnswer: currentAnswer,
+        options,
+        correctAnswer,
+        lessonTitle,
+        lessonId: question.lesson_id,
+        mode
       }
     });
   };
 
   const handleOpen = () => {
     setIsOpen(true);
-    // Auto-fetch if this is the first time open and we have no existing chunk history
     if (!completion && !isLoading && !error) {
-      requestHint();
+      requestHint("hint");
     }
   };
 
@@ -104,17 +111,22 @@ export function AIMentor({ question, currentAnswer }: AIMentorProps) {
                 ) : error ? (
                   <div className="text-center space-y-4">
                      <div className="text-destructive font-bold">{error.message || "Failed to fetch hint"}</div>
-                     <Button variant="outline" size="sm" onClick={requestHint}>Try Again</Button>
+                     <Button variant="outline" size="sm" onClick={() => requestHint("hint")}>Try Again</Button>
                   </div>
                 ) : completion ? (
                   <div className="space-y-4">
                     <div className="flex items-start gap-4 bg-white p-4 rounded-2xl rounded-tl-none border border-indigo-100 shadow-sm relative">
                        <p className="text-indigo-950 font-medium text-sm leading-relaxed">{completion}</p>
                     </div>
-                    {remaining !== null && (
-                       <p className="text-xs font-bold text-center text-indigo-400/80 uppercase tracking-widest">
-                         {remaining} Hints Remaining
-                       </p>
+                    {hintsRemaining !== null && explainsRemaining !== null && (
+                       <div className="flex justify-around mt-2">
+                         <p className="text-xs font-bold text-indigo-400/80 uppercase tracking-widest">
+                           {hintsRemaining} Hints Left
+                         </p>
+                         <p className="text-xs font-bold text-emerald-400/80 uppercase tracking-widest">
+                           {explainsRemaining} Explanations Left
+                         </p>
+                       </div>
                     )}
                   </div>
                 ) : (
@@ -126,15 +138,24 @@ export function AIMentor({ question, currentAnswer }: AIMentorProps) {
              </div>
 
              {/* Footer Interaction */}
-             <div className="p-4 bg-background border-t border-indigo-100 flex justify-end gap-2">
+             <div className="p-4 bg-background border-t border-indigo-100 flex flex-col sm:flex-row justify-end gap-2">
                 <Button 
                    variant="outline" 
-                   onClick={requestHint} 
-                   disabled={isLoading || (remaining !== null && remaining <= 0)}
+                   onClick={() => requestHint("hint")} 
+                   disabled={isLoading || (hintsRemaining !== null && hintsRemaining <= 0)}
                    className="w-full text-indigo-600 border-indigo-200 hover:bg-indigo-50"
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Generate New Hint
+                  Get Hint
+                </Button>
+                <Button 
+                   variant="outline" 
+                   onClick={() => requestHint("explain")} 
+                   disabled={isLoading || (explainsRemaining !== null && explainsRemaining <= 0)}
+                   className="w-full text-emerald-600 border-emerald-200 hover:bg-emerald-50 mt-3 sm:mt-0"
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Explain Concept
                 </Button>
              </div>
            </motion.div>
