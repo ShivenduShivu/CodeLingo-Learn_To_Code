@@ -274,22 +274,31 @@ export async function getCourseProgressMap(userId: string): Promise<Record<strin
     // get levels in this track that user has completed
     const { data: trackLevels } = await supabase
       .from('levels')
-      .select('id')
+      .select('id, xp_reward')
       .eq('track_id', p.track_id);
       
     let completedLevels = 0;
     let xpEarned = 0;
     if (trackLevels && trackLevels.length > 0) {
       const levelIds = trackLevels.map(l => l.id);
-      const { data: levelProgresses } = await supabase
+      const { data: levelProgresses, error: lpError } = await supabase
         .from('level_progress')
-        .select('xp_earned')
+        .select('level_id, stars_earned')
         .eq('user_id', userId)
         .in('level_id', levelIds);
         
+      if (lpError) {
+        console.error("Error fetching level_progress:", lpError.message);
+      }
+        
       if (levelProgresses) {
         completedLevels = levelProgresses.length;
-        xpEarned = levelProgresses.reduce((sum, lp) => sum + (lp.xp_earned || 0), 0);
+        xpEarned = levelProgresses.reduce((sum, lp) => {
+          const lDef = trackLevels.find(l => l.id === lp.level_id);
+          const reward = lDef?.xp_reward || 10;
+          const stars = lp.stars_earned || 0;
+          return sum + reward + (stars * 5);
+        }, 0);
       }
     }
 

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { checkAchievements } from "@/lib/achievements/evaluator";
+import { revalidatePath } from "next/cache";
 
 export async function completeLevel(levelId: string, correctCount: number, totalQuestions: number) {
   const supabase = createClient();
@@ -149,6 +150,10 @@ export async function completeLevel(levelId: string, correctCount: number, total
 
   const unlockResults = await Promise.all(unlockPromises);
   const newAchievements = unlockResults.flat();
+
+  revalidatePath("/dashboard");
+  revalidatePath("/courses");
+  revalidatePath(`/tracks/${trackId}`);
 
   return { success: true, earnedXp: xpEarned, stars, newStreak, newAchievements };
 }
