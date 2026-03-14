@@ -28,13 +28,13 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
   let iconColor = "text-muted-foreground/50";
 
   if (isUnlocked) {
-    bgColor = "bg-primary";
-    borderColor = "border-primary/80 border-b-primary";
-    iconColor = "text-primary-foreground";
+    bgColor = "bg-yellow-400";
+    borderColor = "border-yellow-500 border-b-yellow-600";
+    iconColor = "text-yellow-950";
   } else if (isCompleted) {
-    bgColor = "bg-xp";
-    borderColor = "border-xp/80 border-b-[#E3A000]"; // Deeper gold for the 3D bottom border
-    iconColor = "text-xp-foreground";
+    bgColor = "bg-green-500";
+    borderColor = "border-green-600 border-b-green-700";
+    iconColor = "text-white";
   }
 
   const NodeContent = (

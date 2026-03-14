@@ -237,3 +237,66 @@ export async function getLeaderboard(limit = 50, offset = 0): Promise<UserLeader
   }
   return users || [];
 }
+
+export type CourseProgressSummary = {
+  course_id: string;
+  total_xp: number;
+  track_title: string;
+  completed_levels: number;
+  total_levels: number;
+};
+
+export async function getCourseProgressMap(userId: string): Promise<Record<string, CourseProgressSummary>> {
+  const supabase = createClient();
+  const map: Record<string, CourseProgressSummary> = {};
+  
+  // 1. Get user_progress for all courses
+  const { data: progresses, error } = await supabase
+    .from('user_progress')
+    .select('course_id, track_id, total_xp, tracks:track_id(title)')
+    .eq('user_id', userId);
+    
+  if (error || !progresses) return map;
+
+  // 2. Fetch completed details per active track
+  await Promise.all(progresses.map(async (p) => {
+    if (!p.track_id) return;
+    
+    // get total levels in track
+    const { count: totalLevels } = await supabase
+      .from('levels')
+      .select('id', { count: 'exact', head: true })
+      .eq('track_id', p.track_id);
+      
+    // get levels in this track that user has completed
+    const { data: trackLevels } = await supabase
+      .from('levels')
+      .select('id')
+      .eq('track_id', p.track_id);
+      
+    let completedLevels = 0;
+    if (trackLevels && trackLevels.length > 0) {
+      const levelIds = trackLevels.map(l => l.id);
+      const { count: completedCount } = await supabase
+        .from('level_progress')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .in('level_id', levelIds);
+        
+      completedLevels = completedCount || 0;
+    }
+
+    // @ts-expect-error Typescript might complain about the joined title format
+    const trackTitle = p.tracks?.title || "Active Track";
+
+    map[p.course_id] = {
+      course_id: p.course_id,
+      total_xp: p.total_xp || 0,
+      track_title: trackTitle,
+      completed_levels: completedLevels,
+      total_levels: totalLevels || 0
+    };
+  }));
+
+  return map;
+}

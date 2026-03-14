@@ -2,15 +2,20 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { type Course } from "@/lib/supabase/queries";
+import { type Course, type CourseProgressSummary } from "@/lib/supabase/queries";
 import { EnrollButton } from "./enroll-button";
 
 interface CourseCardProps {
   course: Course;
   isEnrolled: boolean;
+  progressSummary?: CourseProgressSummary;
 }
 
-export function CourseCard({ course, isEnrolled }: CourseCardProps) {
+export function CourseCard({ course, isEnrolled, progressSummary }: CourseCardProps) {
+  const progressPercent = progressSummary && progressSummary.total_levels > 0 
+    ? Math.min(Math.round((progressSummary.completed_levels / progressSummary.total_levels) * 100), 100) 
+    : 0;
+
   const CardContent = (
     <>
       <div className="flex justify-between items-start mb-4">
@@ -39,7 +44,24 @@ export function CourseCard({ course, isEnrolled }: CourseCardProps) {
              <EnrollButton courseId={course.id} />
           </div>
         ) : (
-          <div className="mt-auto">
+          <div className="mt-auto space-y-4">
+            {progressSummary && (
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  <span className="truncate mr-2">{progressSummary.track_title}</span>
+                  <span className="text-xp whitespace-nowrap">{progressSummary.total_xp} XP</span>
+                </div>
+                <div className="h-2.5 w-full bg-secondary rounded-full overflow-hidden">
+                  <div 
+                    className="h-full transition-all duration-500 ease-out rounded-full"
+                    style={{ width: `${progressPercent}%`, backgroundColor: course.color_hex }}
+                  />
+                </div>
+                <div className="text-right text-xs text-muted-foreground font-medium">
+                  {progressPercent}% Complete
+                </div>
+              </div>
+            )}
             <span className="inline-flex items-center text-primary font-bold">
               Continue Learning &rarr;
             </span>

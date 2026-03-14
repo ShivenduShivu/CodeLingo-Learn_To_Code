@@ -1,5 +1,5 @@
 import { CourseList } from "@/components/course/course-list";
-import { getCourses, getEnrolledCourseIds } from "@/lib/supabase/queries";
+import { getCourses, getEnrolledCourseIds, getCourseProgressMap } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -15,6 +15,7 @@ export default async function CoursesPage() {
 
   const allCourses = await getCourses();
   const enrolledIds = await getEnrolledCourseIds(user.id);
+  const courseProgressMap = await getCourseProgressMap(user.id);
 
   return (
     <div className="max-w-6xl mx-auto p-6 md:p-12 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -30,6 +31,7 @@ export default async function CoursesPage() {
       <CourseList 
          courses={allCourses} 
          enrolledIds={enrolledIds}
+         courseProgressMap={courseProgressMap}
          emptyMessage="No available courses."
       />
     </div>

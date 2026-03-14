@@ -1,14 +1,15 @@
 import { CourseCard } from "./course-card";
-import { type Course } from "@/lib/supabase/queries";
+import { type Course, type CourseProgressSummary } from "@/lib/supabase/queries";
 
 export interface CourseListProps {
   courses: Course[];
   enrolledIds: string[];
+  courseProgressMap?: Record<string, CourseProgressSummary>;
   emptyMessage?: string;
   emptySubMessage?: string;
 }
 
-export function CourseList({ courses, enrolledIds, emptyMessage = "No Courses Found", emptySubMessage = "Run your database seed to populate content." }: CourseListProps) {
+export function CourseList({ courses, enrolledIds, courseProgressMap = {}, emptyMessage = "No Courses Found", emptySubMessage = "Run your database seed to populate content." }: CourseListProps) {
   if (!courses || courses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-border rounded-xl">
@@ -25,6 +26,7 @@ export function CourseList({ courses, enrolledIds, emptyMessage = "No Courses Fo
            key={course.id} 
            course={course} 
            isEnrolled={enrolledIds.includes(course.id)} 
+           progressSummary={courseProgressMap[course.id]}
         />
       ))}
     </div>

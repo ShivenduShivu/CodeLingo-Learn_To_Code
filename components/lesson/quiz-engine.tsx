@@ -10,8 +10,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { UnlockEvent } from "@/lib/achievements/evaluator";
-import { AchievementPopup } from "@/components/gamification/achievement-popup";
 import { AIMentor } from "@/components/lesson/ai-mentor";
+import { LessonComplete } from "@/components/lesson/lesson-complete";
 
 interface QuizEngineProps {
   questions: Question[];
@@ -63,10 +63,6 @@ export function QuizEngine({ questions, allAnswers, trackId, onComplete }: QuizE
           if (res.success) {
             const successData = res as { success: true; earnedXp: number; stars: number; newStreak: number; newAchievements?: UnlockEvent[] };
             setEarnedData({ xp: successData.earnedXp, stars: successData.stars, streak: successData.newStreak, achievements: successData.newAchievements });
-            // Auto route out after seeing stats for 4 seconds
-            setTimeout(() => {
-               router.push(`/tracks/${trackId}`);
-            }, 4000);
           } else {
             const errorData = res as { success: false; error: string };
             console.error(errorData.error);
@@ -101,54 +97,39 @@ export function QuizEngine({ questions, allAnswers, trackId, onComplete }: QuizE
   };
 
   if (isFinished) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background relative z-50 p-6">
-        <motion.div 
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", bounce: 0.5 }}
-          className="text-center space-y-6 max-w-lg mb-20 w-full"
-        >
-          <div className="w-32 h-32 mx-auto rounded-full bg-xp flex items-center justify-center mb-8 shadow-xl shadow-xp/20">
-            <span className="text-6xl">🎉</span>
-          </div>
-          <h1 className="text-4xl font-extrabold text-foreground">Lesson Complete!</h1>
-
-          {isSaving ? (
-            <div className="pt-8">
-              <p className="text-sm font-bold text-xp animate-pulse uppercase tracking-wider">
-                Saving progress to Database...
-              </p>
+    if (isSaving) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-background relative z-50 p-6">
+          <motion.div 
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="text-center space-y-6 max-w-lg w-full"
+          >
+            <div className="w-32 h-32 mx-auto rounded-full bg-xp flex items-center justify-center mb-8 shadow-xl shadow-xp/20">
+              <span className="text-6xl">⏳</span>
             </div>
-          ) : earnedData ? (
-             <motion.div 
-               initial={{ opacity: 0, y: 20 }}
-               animate={{ opacity: 1, y: 0 }}
-               className="grid grid-cols-3 gap-4 mt-8"
-             >
-               <div className="bg-card border-2 border-border border-b-4 rounded-xl p-4">
-                 <div className="text-muted-foreground text-sm font-bold uppercase mb-1">XP</div>
-                 <div className="text-xp font-black text-2xl">+{earnedData.xp}</div>
-               </div>
-               <div className="bg-card border-2 border-border border-b-4 rounded-xl p-4">
-                 <div className="text-muted-foreground text-sm font-bold uppercase mb-1">Stars</div>
-                 <div className="text-primary font-black text-2xl">+{earnedData.stars}</div>
-               </div>
-               <div className="bg-card border-2 border-border border-b-4 rounded-xl p-4">
-                 <div className="text-muted-foreground text-sm font-bold uppercase mb-1">Streak</div>
-                 <div className="text-orange-500 font-black text-2xl">{earnedData.streak}🔥</div>
-               </div>
-             </motion.div>
-          ) : null}
+            <h1 className="text-4xl font-extrabold text-foreground">Finishing up...</h1>
+            <p className="text-sm font-bold text-xp animate-pulse uppercase tracking-wider">
+              Saving progress to Database...
+            </p>
+          </motion.div>
+        </div>
+      );
+    }
 
-          {/* Achievement Unlocks Section */}
-          {earnedData?.achievements && earnedData.achievements.length > 0 && (
-            <AchievementPopup achievements={earnedData.achievements} />
-          )}
-          
-        </motion.div>
-      </div>
-    );
+    if (earnedData) {
+      return (
+        <LessonComplete 
+           xp={earnedData.xp} 
+           stars={earnedData.stars} 
+           streak={earnedData.streak} 
+           achievements={earnedData.achievements} 
+           trackId={trackId} 
+        />
+      );
+    }
+    
+    return null;
   }
 
   return (
