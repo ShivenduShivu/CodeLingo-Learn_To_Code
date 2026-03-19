@@ -5,6 +5,7 @@ import { Star, Lock, Check, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Level } from "@/lib/supabase/queries";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 
 export type LevelState = "locked" | "unlocked" | "completed" | "perfected";
 
@@ -22,6 +23,16 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
   const isUnlocked = state === "unlocked";
   const isCompleted = state === "completed" || state === "perfected";
 
+  const nodeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isUnlocked && nodeRef.current) {
+      setTimeout(() => {
+        nodeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 500);
+    }
+  }, [isUnlocked]);
+
   let bgColor = "bg-muted-foreground/20";
   let borderColor = "border-muted-foreground/30";
   let iconColor = "text-muted-foreground/50";
@@ -38,17 +49,20 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
 
   const NodeInner = (
     <motion.div
+      ref={nodeRef}
       whileHover={!isLocked ? { scale: 1.1 } : {}}
       whileTap={!isLocked ? { scale: 0.95 } : {}}
-      className="relative group flex flex-col items-center"
+      animate={isCompleted ? { scale: [1, 1.3, 1] } : {}}
+      transition={isCompleted ? { duration: 0.6, ease: "easeOut" } : {}}
+      className="relative group flex flex-col items-center hover:shadow-lg transition-all"
     >
       <div
         className={cn(
           "relative z-10 w-24 h-24 rounded-full flex flex-col items-center justify-center border-b-8 transition-shadow",
           bgColor,
           borderColor,
-          isLocked && "opacity-80 cursor-not-allowed",
-          isUnlocked && "hover:shadow-2xl shadow-primary/40 ring-4 ring-primary/20",
+          isLocked && "grayscale opacity-50 cursor-not-allowed",
+          isUnlocked && "scale-110 ring-4 ring-emerald-400 animate-pulse hover:shadow-2xl shadow-primary/40",
           !isLocked && "cursor-pointer"
         )}
       >
