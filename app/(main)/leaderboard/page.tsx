@@ -64,7 +64,12 @@ export default async function LeaderboardPage() {
                      </div>
                    </td>
                    <td className="px-6 py-4 font-semibold text-foreground flex items-center gap-3">
-                     {u.username}
+                     <img 
+                        src={u.avatar_url || "https://api.dicebear.com/7.x/bottts/svg?seed=fallback"} 
+                        alt={u.username} 
+                        className="w-8 h-8 rounded-full border border-slate-200 bg-white object-cover shrink-0"
+                     />
+                     <span className="truncate max-w-[120px] sm:max-w-none">{u.username}</span>
                      {isCurrentUser && (
                        <span className="text-xs bg-emerald-500 text-white px-2 py-0.5 rounded-full uppercase tracking-wider font-extrabold">
                          YOU

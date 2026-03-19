@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { Github, Loader2, Chrome } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +24,16 @@ export default function LoginPage() {
       setError(result.error);
       setLoading(false);
     }
+  }
+
+  async function handleGoogleLogin() {
+    const supabase = createClient();
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
   }
 
   return (
@@ -99,8 +110,13 @@ export default function LoginPage() {
           <Github className="mr-2 h-5 w-5" />
           Github
         </Button>
-        <Button variant="outline" type="button" className="h-12 border-2 rounded-xl border-border hover:bg-secondary font-bold" disabled>
-          <Chrome className="mr-2 h-5 w-5" />
+        <Button 
+          variant="outline" 
+          type="button" 
+          className="h-12 border-2 rounded-xl border-border hover:bg-secondary font-bold"
+          onClick={handleGoogleLogin}
+        >
+          <Chrome className="mr-2 h-5 w-5 text-blue-500" />
           Google
         </Button>
       </div>
