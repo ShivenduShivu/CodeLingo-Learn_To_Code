@@ -30,6 +30,8 @@ interface DashboardContentProps {
   userStats: UserStats;
   dailyStats: DailyStats;
   achievements: Achievement[];
+  userRank: number;
+  lessonsToTop5: number;
 }
 
 export function DashboardContent({ 
@@ -38,7 +40,9 @@ export function DashboardContent({
   courseProgressMap, 
   userStats, 
   dailyStats, 
-  achievements 
+  achievements,
+  userRank,
+  lessonsToTop5
 }: DashboardContentProps) {
   const dailyGoalTarget = 5;
   const dailyGoalPercent = Math.min(Math.round((dailyStats.lessonsCompletedToday / dailyGoalTarget) * 100), 100);
@@ -108,10 +112,23 @@ export function DashboardContent({
           <div className="text-xl font-black text-yellow-500">{dailyStats.xpEarnedToday} XP Today</div>
         </div>
         
+        {/* Leaderboard Rank Card */}
+        <div className="bg-card rounded-xl border-2 border-border p-6 flex flex-col items-center justify-center relative overflow-hidden group hover:scale-[1.03] hover:shadow-lg hover:shadow-blue-200 transition-all duration-200 cursor-pointer shadow-md">
+          <div className="text-3xl mb-1">🏆</div>
+          <div className="text-xl font-black text-blue-500 mb-1">Your Rank: #{userRank}</div>
+          {lessonsToTop5 > 0 ? (
+            <div className="text-xs font-bold text-muted-foreground text-center">Only {lessonsToTop5} lessons to reach top 5</div>
+          ) : (
+             <div className="text-xs font-bold text-emerald-500 text-center animate-pulse">You are in the Top 5!</div>
+          )}
+        </div>
+        
         {/* Streak */}
-        <div className="bg-card rounded-xl border-2 border-border p-6 flex flex-col items-center justify-center hover:scale-[1.03] hover:shadow-lg hover:shadow-orange-200 transition-all duration-200 cursor-pointer shadow-md">
-          <div className="text-3xl mb-2">🔥</div>
-          <div className="text-xl font-black text-orange-500">{userStats.streak} Day Streak</div>
+        <div className="bg-card rounded-xl border-2 border-border p-6 flex flex-col items-center justify-center hover:scale-[1.03] hover:shadow-lg hover:shadow-orange-200 transition-all duration-200 cursor-pointer shadow-md group border-orange-200">
+          <div className="text-3xl mb-2 animate-bounce group-hover:animate-none">🔥</div>
+          <div className="text-xl font-black text-orange-500 animate-pulse cursor-help relative" title="Miss a day → streak resets">
+             {userStats.streak} Day Streak
+          </div>
         </div>
       </motion.div>
 

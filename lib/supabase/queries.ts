@@ -221,22 +221,63 @@ export type UserLeaderboard = {
   id: string;
   username: string;
   avatar_url: string;
-  total_xp: number;
+  xp: number;
+  streak: number;
 };
 
-export async function getLeaderboard(limit = 50, offset = 0): Promise<UserLeaderboard[]> {
+export async function getLeaderboard(limit = 20): Promise<UserLeaderboard[]> {
   const supabase = createClient();
   const { data: users, error } = await supabase
     .from('users')
-    .select('id, username, avatar_url, total_xp')
-    .order('total_xp', { ascending: false })
-    .range(offset, offset + limit - 1);
+    .select('id, username, avatar_url');
 
-  if (error) {
-    console.error("Error fetching leaderboard:", error.message);
+  if (error || !users) {
+    console.error("Error fetching leaderboard:", error?.message);
     return [];
   }
-  return users || [];
+
+  // Fetch all progress constraints natively to map dynamically
+  const { data: allLP } = await supabase.from('level_progress').select('user_id, level_id, stars_earned');
+  const { data: allLevels } = await supabase.from('levels').select('id, xp_reward');
+  const { data: allUP } = await supabase.from('user_progress').select('user_id, streak_count, last_activity');
+
+  const leaderboard: UserLeaderboard[] = users.map(user => {
+    // Dynamic XP Calc
+    let totalXp = 0;
+    if (allLP && allLevels) {
+      const userLPs = allLP.filter(lp => lp.user_id === user.id);
+      userLPs.forEach(lp => {
+         const lDef = allLevels.find(l => l.id === lp.level_id);
+         const reward = lDef?.xp_reward || 0;
+         const stars = lp.stars_earned || 0;
+         totalXp += reward + (stars * 5);
+      });
+    }
+
+    // Dynamic Streak Calc
+    let maxStreak = 0;
+    if (allUP) {
+      const userUPs = allUP.filter(up => up.user_id === user.id);
+      for (const p of userUPs) {
+        const activeStreak = calculateStreak(p.last_activity, p.streak_count || 0);
+        if (activeStreak > maxStreak) maxStreak = activeStreak;
+      }
+    }
+
+    return {
+      id: user.id,
+      username: user.username || 'Anonymous',
+      avatar_url: user.avatar_url || '',
+      xp: totalXp,
+      streak: maxStreak
+    };
+  });
+
+  // Sort by XP DESC
+  leaderboard.sort((a, b) => b.xp - a.xp);
+
+  // Return limited
+  return leaderboard.slice(0, limit);
 }
 
 export type CourseProgressSummary = {

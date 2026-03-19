@@ -78,7 +78,7 @@ export function LeaderboardList({ players, currentUserId }: LeaderboardListProps
 
             <div className="flex items-center text-right font-black text-slate-700 whitespace-nowrap">
               {icon}
-              {player.total_xp.toLocaleString()} <span className="text-xs text-muted-foreground ml-1">XP</span>
+              {player.xp.toLocaleString()} <span className="text-xs text-muted-foreground ml-1">XP</span>
             </div>
           </motion.div>
         );
