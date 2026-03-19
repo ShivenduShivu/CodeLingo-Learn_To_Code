@@ -39,11 +39,7 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
   }, [searchParams, level.id]);
 
   useEffect(() => {
-    if (isUnlocked && nodeRef.current) {
-      setTimeout(() => {
-        nodeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 500);
-    }
+    // Window scroll is completely managed by MapContainer Parallax Tracking now
   }, [isUnlocked]);
 
   let bgColor = "bg-muted-foreground/20";
@@ -63,11 +59,11 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
   const NodeInner = (
     <motion.div
       ref={nodeRef}
-      whileHover={!isLocked ? { scale: 1.1 } : {}}
+      whileHover={!isLocked ? { scale: 1.2, rotateY: 10 } : {}}
       whileTap={!isLocked ? { scale: 0.95 } : {}}
       animate={isCompleted ? { scale: [1, 1.3, 1] } : {}}
-      transition={isCompleted ? { duration: 0.6, ease: "easeOut" } : {}}
-      className="relative group flex flex-col items-center hover:shadow-lg transition-all"
+      transition={isCompleted ? { duration: 0.6, ease: "easeOut" } : { type: "spring", stiffness: 200, damping: 15 }}
+      className="relative group flex flex-col items-center hover:shadow-2xl transition-all"
     >
       <div
         className={cn(
@@ -75,7 +71,7 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
           bgColor,
           borderColor,
           isLocked && "bg-gray-300 opacity-50 cursor-not-allowed",
-          isUnlocked && "bg-yellow-400 scale-125 ring-4 ring-yellow-300 animate-bounce shadow-xl",
+          isUnlocked && "bg-yellow-400 scale-125 ring-4 ring-yellow-300 shadow-[0_0_20px_rgba(255,215,0,0.8)] animate-bounce",
           !isLocked && "cursor-pointer"
         )}
       >
@@ -87,15 +83,24 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
 
       <AnimatePresence>
         {showXP && (
-          <motion.div
-            initial={{ opacity: 0, y: 0, scale: 0.8 }}
-            animate={{ opacity: 1, y: -40, scale: 1.2 }}
-            exit={{ opacity: 0, y: -60 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="absolute top-0 text-amber-500 font-extrabold text-2xl drop-shadow-md z-50 pointer-events-none"
-          >
-            +{level.xp_reward} XP
-          </motion.div>
+          <>
+            {/* Pulse Burst Under Node */}
+            <motion.div
+              className="absolute w-32 h-32 bg-yellow-300 rounded-full blur-xl pointer-events-none z-0"
+              animate={{ scale: [0, 2], opacity: [0.8, 0] }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            />
+            {/* Scale Pop Up Arriving Details */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1.5, opacity: 1, y: -50 }}
+              exit={{ opacity: 0, y: -70 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="absolute top-0 text-yellow-500 font-bold text-2xl drop-shadow-md z-50 pointer-events-none whitespace-nowrap"
+            >
+              + {level.xp_reward} XP
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 

@@ -59,9 +59,9 @@ export default async function TrackPage({ params }: TrackPageProps) {
         <p className="text-muted-foreground text-lg">Follow the path and complete lessons to unlock your skills.</p>
       </div>
       
-      <MapContainer progressPercentage={progressPercentage}>
+      <MapContainer>
         <SkipNode trackId={params.trackId} />
-        <LevelPath levels={levels} currentLevelNumber={currentLevelNumber} />
+        <LevelPath levels={levels} currentLevelNumber={currentLevelNumber} progressPercentage={progressPercentage} />
       </MapContainer>
     </div>
   );
