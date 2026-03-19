@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { CodeEditor } from "@/components/lesson/code-editor";
 import { Button } from "@/components/ui/button";
-import { Play } from "lucide-react";
+import { Play, CheckCircle2 } from "lucide-react";
 import type { Question } from "@/lib/supabase/queries";
 import { cn } from "@/lib/utils";
+import { simulatePythonOutput } from "@/lib/utils/code-executor";
 
 interface CodeChallengeProps {
    question: Question;
@@ -17,18 +18,21 @@ interface CodeChallengeProps {
 
 export function CodeChallenge({ question, expectedOutput, onCorrect, onIncorrect, isChecking }: CodeChallengeProps) {
     const [code, setCode] = useState<string>("");
+    const [output, setOutput] = useState<string | null>(null);
 
     const handleRunCode = () => {
-        // MVP Evaluation Engine
-        // Verifies if the user's code inherently "includes" the expected generic output strings 
-        // Note: For a true prod app, we'd deploy Pyodide or a secure Docker sandbox execution API here.
+        const out = simulatePythonOutput(code);
+        setOutput(out);
+    };
+
+    const handleCheckAnswer = () => {
+        const out = simulatePythonOutput(code);
+        setOutput(out);
+        
         if (!expectedOutput) return;
-
-        // Strip whitespaces generically for simple validations
-        const cleanUserCode = code.trim();
-        const cleanExpected = expectedOutput.trim();
-
-        if (cleanUserCode.includes(cleanExpected)) {
+        
+        // Exact string equality check (ignoring only trailing newlines if necessary, but exact matching is safer)
+        if (out.trim() === expectedOutput.trim()) {
            onCorrect(code);
         } else {
            onIncorrect(code);
@@ -52,21 +56,45 @@ export function CodeChallenge({ question, expectedOutput, onCorrect, onIncorrect
                  />
               </div>
 
+              {/* Output block */}
+              {output !== null && (
+                 <div className="bg-muted rounded-lg p-3 text-sm font-mono mt-3 max-w-3xl mx-auto shadow-inner border border-border">
+                    <div className="text-muted-foreground mb-1 select-none border-b border-border/50 pb-1">Your Output</div>
+                    <div className="whitespace-pre-wrap">{output || " "}</div>
+                 </div>
+              )}
+
               {/* Action Button Block */}
-              <div className="flex justify-center pt-4">
+              <div className="flex justify-center pt-4 gap-4">
                   <Button 
                      size="lg" 
                      onClick={handleRunCode}
                      disabled={isChecking || code.trim().length === 0}
+                     variant="outline"
                      className={cn(
-                        "px-8 py-6 rounded-2xl border-b-4 text-xl font-bold transition-all shadow-sm flex items-center gap-3",
+                        "px-8 py-6 rounded-2xl border-b-4 text-xl font-bold transition-all shadow-sm flex items-center gap-2",
+                        code.trim().length > 0
+                           ? "text-foreground hover:bg-muted"
+                           : "opacity-50 cursor-not-allowed"
+                     )}
+                  >
+                     <Play className="w-5 h-5 fill-current" />
+                     Run Code
+                  </Button>
+
+                  <Button 
+                     size="lg" 
+                     onClick={handleCheckAnswer}
+                     disabled={isChecking || code.trim().length === 0}
+                     className={cn(
+                        "px-8 py-6 rounded-2xl border-b-4 text-xl font-bold transition-all shadow-sm flex items-center gap-2",
                         code.trim().length > 0
                            ? "bg-emerald-500 hover:bg-emerald-600 border-emerald-700 text-white"
                            : "bg-muted text-muted-foreground border-transparent opacity-50 cursor-not-allowed hover:bg-muted"
                      )}
                   >
-                     <Play className="w-5 h-5 fill-current" />
-                     {isChecking ? "Checking..." : "Run Code"}
+                     <CheckCircle2 className="w-5 h-5" />
+                     {isChecking ? "Checking..." : "Check Answer"}
                   </Button>
               </div>
            </div>

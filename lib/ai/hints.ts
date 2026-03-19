@@ -14,6 +14,7 @@ export async function generateHintStream(
   questionText: string,
   questionType: string,
   userAnswer?: string,
+  actualOutput?: string,
   options?: string[],
   correctAnswer?: string,
   lessonTitle?: string,
@@ -45,16 +46,25 @@ Limit your response to a maximum of 3 sentences.`;
        if (userAnswer) {
          userPrompt += `Student's Code Attempt:\n\`\`\`\n${userAnswer}\n\`\`\`\n`;
        }
+       if (actualOutput !== undefined) {
+         userPrompt += `Student's Actual Output Evaluated to:\n"${actualOutput}"\n`;
+       }
        if (correctAnswer) {
          userPrompt += `Expected Output snippet: "${correctAnswer}"\n`;
        }
-       userPrompt += `\nPlease explain the conceptual error or syntax mistake in their code cleanly. Avoid giving them the completely corrected code blocks if possible.`;
+       userPrompt += `\nPlease explain the conceptual error or syntax mistake in their code cleanly. Avoid giving them the completely corrected code blocks if possible.
+If the student code produces incorrect output:
+Explain what is wrong step-by-step.
+Do not reveal the final correct code directly.`;
     } else {
        // Hint Mode for Code
        userPrompt += `\nThe student needs a hint for this coding challenge.`;
        if (userAnswer) {
          userPrompt += `\nThey wrote this code:\n\`\`\`\n${userAnswer}\n\`\`\`\n`;
-         userPrompt += `Gently point out one flaw or give them a tiny nudge in the right direction.`;
+         if (actualOutput !== undefined) {
+             userPrompt += `Which evaluated to this output: "${actualOutput}"\n`;
+         }
+         userPrompt += `Gently point out one flaw or give them a tiny nudge in the right direction. If the student code produces incorrect output, explain what is wrong step-by-step. Do not reveal the final correct code directly.`;
        }
     }
   } else {

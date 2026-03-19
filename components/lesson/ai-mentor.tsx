@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Sparkles, X, MessageSquare, Loader2 } from "lucide-react";
 import { isLessonWeak } from "@/lib/utils/practice-detector";
+import { simulatePythonOutput } from "@/lib/utils/code-executor";
 import type { Question } from "@/lib/supabase/queries";
 
 interface AIMentorProps {
@@ -44,10 +45,16 @@ export function AIMentor({ question, currentAnswer, options, correctAnswer, less
   });
 
   const requestHint = (mode: "hint" | "explain" = "hint") => {
+      let actualOutput = undefined;
+      if (question.question_type === "code" && currentAnswer) {
+          actualOutput = simulatePythonOutput(currentAnswer);
+      }
+
       complete(question.question_text, {
       body: {
         questionType: question.question_type,
         userAnswer: currentAnswer,
+        actualOutput,
         options,
         correctAnswer,
         lessonTitle,
