@@ -5,7 +5,9 @@ import { Star, Lock, Check, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Level } from "@/lib/supabase/queries";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
 
 export type LevelState = "locked" | "unlocked" | "completed" | "perfected";
 
@@ -24,6 +26,17 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
   const isCompleted = state === "completed" || state === "perfected";
 
   const nodeRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const [showXP, setShowXP] = useState(false);
+
+  useEffect(() => {
+    // If the URL contains ?completedLevelId=XYZ and this is the matching node, trigger float
+    if (searchParams.get("completedLevelId") === level.id) {
+       setShowXP(true);
+       const t = setTimeout(() => setShowXP(false), 2000);
+       return () => clearTimeout(t);
+    }
+  }, [searchParams, level.id]);
 
   useEffect(() => {
     if (isUnlocked && nodeRef.current) {
@@ -61,20 +74,35 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
           "relative z-10 w-24 h-24 rounded-full flex flex-col items-center justify-center border-b-8 transition-shadow",
           bgColor,
           borderColor,
-          isLocked && "grayscale opacity-50 cursor-not-allowed",
-          isUnlocked && "scale-110 ring-4 ring-emerald-400 animate-pulse hover:shadow-2xl shadow-primary/40",
+          isLocked && "bg-gray-300 opacity-50 cursor-not-allowed",
+          isUnlocked && "bg-yellow-400 scale-125 ring-4 ring-yellow-300 animate-bounce shadow-xl",
           !isLocked && "cursor-pointer"
         )}
       >
         {state === "locked" && <Lock className={cn("w-10 h-10", iconColor)} />}
         {state === "unlocked" && <Star className={cn("w-10 h-10 fill-current", iconColor)} />}
-        {state === "completed" && <Check className={cn("w-10 h-10", iconColor, "font-extrabold")} />}
+        {state === "completed" && <Check className={cn("w-10 h-10 text-white font-extrabold")} />}
         {state === "perfected" && <Crown className={cn("w-10 h-10 fill-current", iconColor)} />}
       </div>
+
+      <AnimatePresence>
+        {showXP && (
+          <motion.div
+            initial={{ opacity: 0, y: 0, scale: 0.8 }}
+            animate={{ opacity: 1, y: -40, scale: 1.2 }}
+            exit={{ opacity: 0, y: -60 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="absolute top-0 text-amber-500 font-extrabold text-2xl drop-shadow-md z-50 pointer-events-none"
+          >
+            +{level.xp_reward} XP
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Static Label Below Node */}
       <div className="text-xs text-muted-foreground text-center mt-2 font-bold max-w-[120px]">
         {level.title}
+        {isUnlocked && <div className="text-[10px] text-yellow-600 font-extrabold uppercase mt-1 animate-pulse tracking-widest">Start Here</div>}
       </div>
 
       {/* Floating Tooltip Label */}

@@ -31,68 +31,127 @@ BEGIN
     INSERT INTO public.tracks (id, course_id, title, difficulty_level, order_index)
     VALUES
     (ml_beginner_track_id, ml_course_id, 'Data Fundamentals', 'Beginner', 1),
-    (ml_intermediate_track_id, ml_course_id, 'Supervised Learning', 'Intermediate', 2),
+    (ml_intermediate_track_id, ml_course_id, 'Algorithms', 'Intermediate', 2),
     (ml_advanced_track_id, ml_course_id, 'Neural Networks', 'Advanced', 3);
 
-    -- Seed Python Levels (Beginner)
-    -- We need to capture the exact UUID of Level 1 so we can attach a lesson to it!
+    -- --------------------------------------------------------------------------------------
+    -- PYTHON LEVELS (Variables, Loops, Functions, Conditions, Lists)
+    -- --------------------------------------------------------------------------------------
     DECLARE
-        python_lvl1_id UUID := gen_random_uuid();
-        lesson_id UUID := gen_random_uuid();
-        q1_id UUID := gen_random_uuid();
-        q2_id UUID := gen_random_uuid();
-        q3_id UUID := gen_random_uuid();
+        p_lvl1_id UUID := gen_random_uuid();
+        p_lvl2_id UUID := gen_random_uuid();
+        p_lvl3_id UUID := gen_random_uuid();
+        p_lvl4_id UUID := gen_random_uuid();
+        p_lvl5_id UUID := gen_random_uuid();
+
+        ml_lvl1_id UUID := gen_random_uuid();
+        ml_lvl2_id UUID := gen_random_uuid();
+        ml_lvl3_id UUID := gen_random_uuid();
+        ml_lvl4_id UUID := gen_random_uuid();
+
+        lesson_id UUID;
+        q_id UUID;
     BEGIN
         INSERT INTO public.levels (id, track_id, level_number, title, xp_reward)
         VALUES
-        (python_lvl1_id, python_beginner_track_id, 1, 'Print & Strings', 10),
-        (gen_random_uuid(), python_beginner_track_id, 2, 'Variables', 10),
-        (gen_random_uuid(), python_beginner_track_id, 3, 'Math Operations', 15),
-        (gen_random_uuid(), python_beginner_track_id, 4, 'If/Else Logic', 20),
-        (gen_random_uuid(), python_beginner_track_id, 5, 'Basic Loops', 20);
+        (p_lvl1_id, python_beginner_track_id, 1, 'Variables', 10),
+        (p_lvl2_id, python_beginner_track_id, 2, 'Conditions', 15),
+        (p_lvl3_id, python_beginner_track_id, 3, 'Loops', 15),
+        (p_lvl4_id, python_beginner_track_id, 4, 'Functions', 20),
+        (p_lvl5_id, python_beginner_track_id, 5, 'Lists', 20);
 
-        -- Seed Machine Learning Levels (Beginner)
-        INSERT INTO public.levels (track_id, level_number, title, xp_reward)
+        INSERT INTO public.levels (id, track_id, level_number, title, xp_reward)
         VALUES
-        (ml_beginner_track_id, 1, 'What is ML?', 10),
-        (ml_beginner_track_id, 2, 'Types of Learning', 10),
-        (ml_beginner_track_id, 3, 'Data Cleaning', 15),
-        (ml_beginner_track_id, 4, 'Features & Labels', 20),
-        (ml_beginner_track_id, 5, 'Training Sets', 20);
+        (ml_lvl1_id, ml_beginner_track_id, 1, 'What is ML?', 10),
+        (ml_lvl2_id, ml_beginner_track_id, 2, 'Supervised vs Unsupervised', 10),
+        (ml_lvl3_id, ml_beginner_track_id, 3, 'Data & Features', 15),
+        (ml_lvl4_id, ml_beginner_track_id, 4, 'Simple Prediction', 20);
 
-        -- ---------------------------------------------------------
-        -- SEED NESTED LESSON DATA FOR PYTHON LEVEL 1
-        -- ---------------------------------------------------------
-        INSERT INTO public.lessons (id, level_id, title, lesson_type, lesson_order)
-        VALUES (lesson_id, python_lvl1_id, 'Introduction to Python Strings', 'quiz', 1);
+        -- PYTHON 1: VARIABLES
+        lesson_id := gen_random_uuid();
+        INSERT INTO public.lessons (id, level_id, title, lesson_type, lesson_order) VALUES (lesson_id, p_lvl1_id, 'Understanding Variables', 'quiz', 1);
+        
+        q_id := gen_random_uuid();
+        INSERT INTO public.questions (id, lesson_id, question_type, question_text, explanation) VALUES (q_id, lesson_id, 'multiple_choice', 'What is a variable?', 'A container for storing data values.');
+        INSERT INTO public.answers (question_id, answer_text, is_correct) VALUES 
+          (q_id, 'A container for data', true), (q_id, 'A loop', false), (q_id, 'A class', false);
+          
+        q_id := gen_random_uuid();
+        INSERT INTO public.questions (id, lesson_id, question_type, question_text, explanation) VALUES (q_id, lesson_id, 'multiple_choice', 'Which is valid in Python?', 'No let, var or const is needed directly in python definitions.');
+        INSERT INTO public.answers (question_id, answer_text, is_correct) VALUES 
+          (q_id, 'var x = 5', false), (q_id, 'x = 5', true), (q_id, 'let x = 5', false);
 
-        -- Insert 3 Questions for the lesson
-        INSERT INTO public.questions (id, lesson_id, question_type, question_text, explanation)
-        VALUES
-        (q1_id, lesson_id, 'multiple_choice', 'How do you print "Hello World" in Python?', 'The print() function is used to output text to the console.'),
-        (q2_id, lesson_id, 'multiple_choice', 'Which character is used to create a comment?', 'The # symbol marks the start of a single-line comment in Python.'),
-        (q3_id, lesson_id, 'multiple_choice', 'Which of these is a valid variable name?', 'Variable names cannot start with a number or be a reserved keyword (like class). They also cannot contain spaces.');
+        -- PYTHON 2: CONDITIONS
+        lesson_id := gen_random_uuid();
+        INSERT INTO public.lessons (id, level_id, title, lesson_type, lesson_order) VALUES (lesson_id, p_lvl2_id, 'If Else logic', 'quiz', 1);
+        
+        q_id := gen_random_uuid();
+        INSERT INTO public.questions (id, lesson_id, question_type, question_text, explanation) VALUES (q_id, lesson_id, 'multiple_choice', 'Which keyword checks an alternative condition?', 'elif is Python''s else if form.');
+        INSERT INTO public.answers (question_id, answer_text, is_correct) VALUES 
+          (q_id, 'else if', false), (q_id, 'elseif', false), (q_id, 'elif', true);
 
-        -- Insert Answers for Question 1
-        INSERT INTO public.answers (question_id, answer_text, is_correct) VALUES
-        (q1_id, 'echo "Hello World"', false),
-        (q1_id, 'console.log("Hello World")', false),
-        (q1_id, 'print("Hello World")', true),
-        (q1_id, 'printf("Hello World")', false);
+        -- PYTHON 3: LOOPS
+        lesson_id := gen_random_uuid();
+        INSERT INTO public.lessons (id, level_id, title, lesson_type, lesson_order) VALUES (lesson_id, p_lvl3_id, 'For & While Loops', 'quiz', 1);
+        
+        q_id := gen_random_uuid();
+        INSERT INTO public.questions (id, lesson_id, question_type, question_text, explanation) VALUES (q_id, lesson_id, 'multiple_choice', 'How to write a standard loop iterating 5 times?', 'range(5) outputs indices 0 to 4.');
+        INSERT INTO public.answers (question_id, answer_text, is_correct) VALUES 
+          (q_id, 'for i = 1 to 5:', false), (q_id, 'for i in range(5):', true), (q_id, 'loop 5 times:', false);
 
-        -- Insert Answers for Question 2
-        INSERT INTO public.answers (question_id, answer_text, is_correct) VALUES
-        (q2_id, '//', false),
-        (q2_id, '/* */', false),
-        (q2_id, '<!-- -->', false),
-        (q2_id, '#', true);
+        -- PYTHON 4: FUNCTIONS
+        lesson_id := gen_random_uuid();
+        INSERT INTO public.lessons (id, level_id, title, lesson_type, lesson_order) VALUES (lesson_id, p_lvl4_id, 'Def Blocks', 'code', 1);
+        
+        q_id := gen_random_uuid();
+        INSERT INTO public.questions (id, lesson_id, question_type, question_text, explanation) VALUES (q_id, lesson_id, 'code', 'Define a function called hello that prints "Hello" and call it.', 'Use the def keyword.');
+        INSERT INTO public.answers (question_id, answer_text, is_correct) VALUES 
+          (q_id, 'Hello\n', true);
 
-        -- Insert Answers for Question 3
-        INSERT INTO public.answers (question_id, answer_text, is_correct) VALUES
-        (q3_id, '1st_variable', false),
-        (q3_id, 'my variable', false),
-        (q3_id, 'my_variable_1', true),
-        (q3_id, 'class', false);
+        -- PYTHON 5: LISTS
+        lesson_id := gen_random_uuid();
+        INSERT INTO public.lessons (id, level_id, title, lesson_type, lesson_order) VALUES (lesson_id, p_lvl5_id, 'List Logic', 'quiz', 1);
+        
+        q_id := gen_random_uuid();
+        INSERT INTO public.questions (id, lesson_id, question_type, question_text, explanation) VALUES (q_id, lesson_id, 'multiple_choice', 'How do you create an array/list in Python?', 'Square Brackets are standard list constructors.');
+        INSERT INTO public.answers (question_id, answer_text, is_correct) VALUES 
+          (q_id, 'myList = ()', false), (q_id, 'myList = []', true), (q_id, 'myList = {}', false);
+
+        -- ML 1: WHAT IS ML
+        lesson_id := gen_random_uuid();
+        INSERT INTO public.lessons (id, level_id, title, lesson_type, lesson_order) VALUES (lesson_id, ml_lvl1_id, 'Definition of Machine Learning', 'quiz', 1);
+        
+        q_id := gen_random_uuid();
+        INSERT INTO public.questions (id, lesson_id, question_type, question_text, explanation) VALUES (q_id, lesson_id, 'multiple_choice', 'What is Machine Learning fundamentally?', 'Algorithms learning from data patterns rather than strict rules.');
+        INSERT INTO public.answers (question_id, answer_text, is_correct) VALUES 
+          (q_id, 'Writing strict if-else rules', false), (q_id, 'Algorithms learning from data patterns', true);
+
+        -- ML 2: SUPERVISED VS UNSUPERVISED
+        lesson_id := gen_random_uuid();
+        INSERT INTO public.lessons (id, level_id, title, lesson_type, lesson_order) VALUES (lesson_id, ml_lvl2_id, 'Types of Learning', 'quiz', 1);
+        
+        q_id := gen_random_uuid();
+        INSERT INTO public.questions (id, lesson_id, question_type, question_text, explanation) VALUES (q_id, lesson_id, 'multiple_choice', 'What makes learning Supervised?', 'When data is labeled and targets are provided.');
+        INSERT INTO public.answers (question_id, answer_text, is_correct) VALUES 
+          (q_id, 'Providing data with labeled targets', true), (q_id, 'The model groups data on its own', false);
+
+        -- ML 3: DATA & FEATURES
+        lesson_id := gen_random_uuid();
+        INSERT INTO public.lessons (id, level_id, title, lesson_type, lesson_order) VALUES (lesson_id, ml_lvl3_id, 'Preparing Data', 'quiz', 1);
+        
+        q_id := gen_random_uuid();
+        INSERT INTO public.questions (id, lesson_id, question_type, question_text, explanation) VALUES (q_id, lesson_id, 'multiple_choice', 'What is a feature?', 'Features are measurable properties or characteristics used as inputs.');
+        INSERT INTO public.answers (question_id, answer_text, is_correct) VALUES 
+          (q_id, 'The final prediction', false), (q_id, 'An input variable used for prediction', true);
+
+        -- ML 4: SIMPLE PREDICTION
+        lesson_id := gen_random_uuid();
+        INSERT INTO public.lessons (id, level_id, title, lesson_type, lesson_order) VALUES (lesson_id, ml_lvl4_id, 'Making Inferences', 'quiz', 1);
+        
+        q_id := gen_random_uuid();
+        INSERT INTO public.questions (id, lesson_id, question_type, question_text, explanation) VALUES (q_id, lesson_id, 'multiple_choice', 'What is Inference?', 'Using a trained model to make predictions on new data.');
+        INSERT INTO public.answers (question_id, answer_text, is_correct) VALUES 
+          (q_id, 'Training the model', false), (q_id, 'Making predictions on unseen data', true);
 
     END;
 END $$;

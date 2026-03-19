@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useMotionValue, animate, useTransform } from "framer-motion";
 import Link from "next/link";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { CourseList } from "@/components/course/course-list";
 import { AchievementPanel } from "@/components/gamification/achievement-panel";
@@ -42,6 +43,14 @@ export function DashboardContent({
   const dailyGoalTarget = 5;
   const dailyGoalPercent = Math.min(Math.round((dailyStats.lessonsCompletedToday / dailyGoalTarget) * 100), 100);
 
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, Math.round);
+
+  useEffect(() => {
+    const animation = animate(count, userStats.totalXp, { duration: 2, ease: "easeOut" });
+    return animation.stop;
+  }, [userStats.totalXp, count]);
+
   return (
     <motion.div 
       variants={containerVariants}
@@ -62,14 +71,11 @@ export function DashboardContent({
       {/* 2. STATS OVERVIEW */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         {/* Daily Goal Card */}
-        <div className="md:col-span-2 bg-card rounded-xl border-2 border-border p-6 flex flex-col justify-center relative overflow-hidden group hover:scale-[1.03] hover:shadow-lg hover:shadow-green-200 transition-all duration-200 cursor-pointer shadow-md">
+        <div className="bg-card rounded-xl border-2 border-border p-6 flex flex-col justify-center relative overflow-hidden group hover:scale-[1.03] hover:shadow-lg hover:shadow-green-200 transition-all duration-200 cursor-pointer shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-bold flex items-center gap-2">
               🎯 Daily Goal
             </h3>
-            <span className="text-sm font-bold text-muted-foreground bg-muted px-3 py-1 rounded-full">
-              {dailyStats.lessonsCompletedToday} / {dailyGoalTarget} Lessons
-            </span>
           </div>
           <div className="h-4 w-full bg-muted rounded-full overflow-hidden relative border border-border">
             <motion.div 
@@ -82,8 +88,17 @@ export function DashboardContent({
               <div className="absolute inset-0 bg-white/20 animate-pulse" />
             )}
           </div>
-          <div className="text-right text-xs text-muted-foreground font-medium mt-2">
-            {dailyGoalPercent}% Complete
+          <div className="flex justify-between mt-2">
+             <span className="text-sm font-bold text-muted-foreground">{dailyStats.lessonsCompletedToday} / {dailyGoalTarget}</span>
+             <span className="text-xs text-muted-foreground font-medium">{dailyGoalPercent}%</span>
+          </div>
+        </div>
+
+        {/* Global Total XP (Animated) */}
+        <div className="bg-card rounded-xl border-2 border-border p-6 flex flex-col items-center justify-center hover:scale-[1.03] hover:shadow-lg hover:shadow-xp/40 transition-all duration-200 cursor-pointer shadow-md">
+          <div className="text-3xl mb-2">⭐</div>
+          <div className="text-xl font-black text-xp flex items-center gap-1">
+             <motion.span>{rounded}</motion.span> Total XP
           </div>
         </div>
 

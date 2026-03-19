@@ -15,6 +15,7 @@ import { AIMentor } from "@/components/lesson/ai-mentor";
 import { LessonComplete } from "@/components/lesson/lesson-complete";
 import { FeedbackPanel } from "@/components/lesson/feedback-panel";
 import { recordIncorrectAttempt, clearWeakLesson } from "@/lib/utils/practice-detector";
+import { playCorrectSound, playClickSound, playLevelUpSound } from "@/lib/utils/sound";
 
 interface QuizEngineProps {
   questions: Question[];
@@ -48,6 +49,12 @@ export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, practi
     resetLesson();
   }, [resetLesson]);
 
+  useEffect(() => {
+    if (isChecking && isCorrect) {
+      playCorrectSound();
+    }
+  }, [isChecking, isCorrect]);
+
   if (questions.length === 0) {
     return <div className="p-8 text-center text-muted-foreground">No questions found for this lesson yet.</div>;
   }
@@ -59,9 +66,11 @@ export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, practi
     if (isChecking) {
       // Currently displaying results -> Move to next or Finish
       if (currentQuestionIndex < questions.length - 1) {
+        playClickSound();
         nextQuestion(questions.length);
       } else {
         // Finish the quiz! Trigger injected Server Action
+        playClickSound();
         setIsFinished(true);
         setIsSaving(true);
         try {
@@ -72,6 +81,7 @@ export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, practi
             }
             const successData = res as { success: true; earnedXp: number; stars: number; newStreak: number; newAchievements?: UnlockEvent[] };
             setEarnedData({ xp: successData.earnedXp, stars: successData.stars, streak: successData.newStreak, achievements: successData.newAchievements });
+            playLevelUpSound();
           } else {
             const errorData = res as { success: false; error: string };
             console.error(errorData.error);
@@ -94,6 +104,7 @@ export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, practi
       }
     } else {
       // Not checked yet -> Check the answer!
+      playClickSound();
       if (!selectedAnswer) return;
       const answered = answersForCurrentQ.find(a => a.id === selectedAnswer);
       if (answered) {

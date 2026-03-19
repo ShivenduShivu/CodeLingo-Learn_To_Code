@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { type Course, type CourseProgressSummary } from "@/lib/supabase/queries";
 import { EnrollButton } from "./enroll-button";
+import { playClickSound } from "@/lib/utils/sound";
 
 interface CourseCardProps {
   course: Course;
@@ -83,20 +84,8 @@ export function CourseCard({ course, isEnrolled, progressSummary }: CourseCardPr
   const wrapperProps = {
     whileHover: { scale: 1.05, y: -5, transition: { type: "spring" as const, stiffness: 300 } },
     whileTap: { scale: 0.95 },
-    className: "group relative flex flex-col justify-between overflow-hidden rounded-2xl border-2 border-b-8 border-border bg-card p-6 cursor-pointer transition-shadow h-full",
+    className: "group relative flex flex-col justify-between overflow-hidden rounded-2xl border-2 border-b-8 border-border hover:border-emerald-300 hover:shadow-xl bg-card p-6 cursor-pointer transition-all duration-300 h-full",
     style: { boxShadow: `0 0 0 0 ${course.color_hex}00` }
-  };
-
-  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.currentTarget.style.boxShadow = `0px 10px 40px -10px ${course.color_hex}80`;
-    e.currentTarget.style.borderColor = `${course.color_hex}60`;
-    e.currentTarget.style.borderBottomColor = course.color_hex;
-  };
-
-  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.currentTarget.style.boxShadow = "";
-    e.currentTarget.style.borderColor = "";
-    e.currentTarget.style.borderBottomColor = "";
   };
 
   if (isEnrolled) {
@@ -104,9 +93,8 @@ export function CourseCard({ course, isEnrolled, progressSummary }: CourseCardPr
        <Link className="h-full block" href={`/courses/${course.slug}`}>
          <motion.div 
             {...wrapperProps} 
-            className={wrapperProps.className + " hover:-translate-y-1"}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
+            className={wrapperProps.className}
+            onClick={() => playClickSound()}
          >
             {CardContent}
          </motion.div>
@@ -118,8 +106,7 @@ export function CourseCard({ course, isEnrolled, progressSummary }: CourseCardPr
   return (
     <motion.div 
        {...wrapperProps}
-       onMouseEnter={handleMouseEnter}
-       onMouseLeave={handleMouseLeave}
+       onClick={() => playClickSound()}
     >
        {CardContent}
     </motion.div>

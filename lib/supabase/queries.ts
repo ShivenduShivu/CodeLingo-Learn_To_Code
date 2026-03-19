@@ -329,20 +329,30 @@ export type UserStats = {
 export async function getUserStats(userId: string): Promise<UserStats> {
   const supabase = createClient();
 
-  // 1. Total XP from users table
-  const { data: userData } = await supabase
-    .from('users')
-    .select('total_xp')
-    .eq('id', userId)
-    .maybeSingle();
-
-  const totalXp = userData?.total_xp || 0;
-
-  // 2. Levels Completed
-  const { count: completedLevels } = await supabase
+  // 1. Real-time Total XP Computation
+  const { data: levelProgresses } = await supabase
     .from('level_progress')
-    .select('*', { count: 'exact', head: true })
+    .select('level_id, stars_earned')
     .eq('user_id', userId);
+
+  let totalXp = 0;
+  let completedLevels = 0;
+
+  if (levelProgresses && levelProgresses.length > 0) {
+    completedLevels = levelProgresses.length;
+    const levelIds = levelProgresses.map((lp) => lp.level_id);
+    const { data: levels } = await supabase
+      .from('levels')
+      .select('id, xp_reward')
+      .in('id', levelIds);
+
+    levelProgresses.forEach((lp) => {
+      const lDef = levels?.find(l => l.id === lp.level_id);
+      const reward = lDef?.xp_reward || 0;
+      const stars = lp.stars_earned || 0;
+      totalXp += reward + (stars * 5);
+    });
+  }
 
   // 3. Streak
   const { data: progresses } = await supabase
@@ -363,7 +373,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
   return {
     totalXp,
     streak: maxStreak,
-    levelsCompleted: completedLevels || 0
+    levelsCompleted: completedLevels
   };
 }
 
