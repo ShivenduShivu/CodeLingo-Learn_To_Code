@@ -24,7 +24,7 @@ export async function POST(req: Request) {
        prompt: questionText, 
        questionType, 
        userAnswer, 
-       options, 
+       options = [], 
        correctAnswer, 
        lessonTitle, 
        lessonId,
@@ -90,7 +90,8 @@ export async function POST(req: Request) {
     });
 
   } catch (error) {
-    console.error('Hint API Route Error:', error);
+    console.error("AI ERROR:", error);
+    console.error('Hint API Route Error TRACE:', error);
     return NextResponse.json({ error: 'Internal server error generating hint.' }, { status: 500 });
   }
 }

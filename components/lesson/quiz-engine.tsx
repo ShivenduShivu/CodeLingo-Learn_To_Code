@@ -55,12 +55,15 @@ export function QuizEngine({ questions, allAnswers, trackId, lessonTitle, practi
     }
   }, [isChecking, isCorrect]);
 
-  if (questions.length === 0) {
+  if (!questions || questions.length === 0) {
     return <div className="p-8 text-center text-muted-foreground">No questions found for this lesson yet.</div>;
   }
 
   const currentQuestion = questions[currentQuestionIndex];
-  const answersForCurrentQ = allAnswers[currentQuestion.id] || [];
+  
+  if (!currentQuestion) return null;
+
+  const answersForCurrentQ = allAnswers[currentQuestion?.id] || [];
 
   const handleActionClick = async () => {
     if (isChecking) {

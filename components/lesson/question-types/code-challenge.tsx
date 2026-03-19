@@ -8,6 +8,10 @@ import type { Question } from "@/lib/supabase/queries";
 import { cn } from "@/lib/utils";
 import { simulatePythonOutput } from "@/lib/utils/code-executor";
 
+function normalize(output: string) {
+  return output.trim().replace(/\s+/g, " ");
+}
+
 interface CodeChallengeProps {
    question: Question;
    expectedOutput?: string; // e.g: "Hello\n"
@@ -19,10 +23,12 @@ interface CodeChallengeProps {
 export function CodeChallenge({ question, expectedOutput, onCorrect, onIncorrect, isChecking }: CodeChallengeProps) {
     const [code, setCode] = useState<string>("");
     const [output, setOutput] = useState<string | null>(null);
+    const [showMismatch, setShowMismatch] = useState(false);
 
     const handleRunCode = () => {
         const out = simulatePythonOutput(code);
         setOutput(out);
+        setShowMismatch(false);
     };
 
     const handleCheckAnswer = () => {
@@ -30,11 +36,15 @@ export function CodeChallenge({ question, expectedOutput, onCorrect, onIncorrect
         setOutput(out);
         
         if (!expectedOutput) return;
+
+        console.log("EXPECTED:", expectedOutput);
+        console.log("ACTUAL:", out);
         
-        // Exact string equality check (ignoring only trailing newlines if necessary, but exact matching is safer)
-        if (out.trim() === expectedOutput.trim()) {
+        if (normalize(out) === normalize(expectedOutput)) {
+           setShowMismatch(false);
            onCorrect(code);
         } else {
+           setShowMismatch(true);
            onIncorrect(code);
         }
     };
@@ -56,13 +66,19 @@ export function CodeChallenge({ question, expectedOutput, onCorrect, onIncorrect
                  />
               </div>
 
-              {/* Output block */}
-              {output !== null && (
-                 <div className="bg-muted rounded-lg p-3 text-sm font-mono mt-3 max-w-3xl mx-auto shadow-inner border border-border">
-                    <div className="text-muted-foreground mb-1 select-none border-b border-border/50 pb-1">Your Output</div>
-                    <div className="whitespace-pre-wrap">{output || " "}</div>
-                 </div>
-              )}
+               {/* Output block */}
+               {output !== null && (
+                  <div className="bg-muted rounded-lg p-3 text-sm font-mono mt-3 max-w-3xl mx-auto shadow-inner border border-border">
+                     <div className="text-muted-foreground mb-1 select-none border-b border-border/50 pb-1">Your Output</div>
+                     <div className="whitespace-pre-wrap">{output || " "}</div>
+                     {showMismatch && expectedOutput && (
+                        <div className="mt-4 pt-4 border-t border-border/50 text-red-400 whitespace-pre-wrap font-bold">
+                           <div>Expected: {expectedOutput}</div>
+                           <div>Got: {output}</div>
+                        </div>
+                     )}
+                  </div>
+               )}
 
               {/* Action Button Block */}
               <div className="flex justify-center pt-4 gap-4">

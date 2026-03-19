@@ -1,25 +1,30 @@
 "use client";
 
-export function playCorrectSound() {
-  if (typeof window !== "undefined") {
-    const audio = new Audio("/sounds/correct.mp3");
-    audio.volume = 0.5;
-    audio.play().catch(() => {});
-  }
+let isInitialized = false;
+
+export function initSound() {
+  if (isInitialized) return;
+  isInitialized = true;
 }
 
-export function playLevelUpSound() {
-  if (typeof window !== "undefined") {
-    const audio = new Audio("/sounds/levelup.mp3");
-    audio.volume = 0.6;
+function play(src: string) {
+  if (!isInitialized) return;
+
+  try {
+    const audio = new Audio(src);
+    audio.volume = 0.5;
     audio.play().catch(() => {});
-  }
+  } catch {}
 }
 
 export function playClickSound() {
-  if (typeof window !== "undefined") {
-    const audio = new Audio("/sounds/click.mp3");
-    audio.volume = 0.3;
-    audio.play().catch(() => {});
-  }
+  play("/sounds/click.mp3");
+}
+
+export function playCorrectSound() {
+  play("/sounds/correct.mp3");
+}
+
+export function playLevelUpSound() {
+  play("/sounds/levelup.mp3");
 }

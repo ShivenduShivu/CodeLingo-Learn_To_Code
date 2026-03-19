@@ -36,8 +36,11 @@ Limit your response to a maximum of 3 sentences.`;
   userPrompt += `Question Type: ${questionType}\n`;
   userPrompt += `Question: "${questionText}"\n`;
 
-  if (options && options.length > 0) {
-    userPrompt += `Options given to student: [${options.join(", ")}]\n`;
+  console.log("OPTIONS DEBUG:", options);
+  const safeOptions = Array.isArray(options) ? options : [];
+
+  if (safeOptions.length > 0) {
+    userPrompt += `Options given to student: [${safeOptions.join(", ")}]\n`;
   }
 
   if (questionType === "code") {
