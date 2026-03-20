@@ -30,18 +30,18 @@ export function PracticeCard() {
         transition={{ duration: 0.4 }}
         className="w-full mb-8 mt-8"
       >
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+        <h2 className="text-white text-lg font-semibold tracking-wide mb-4 flex items-center gap-2">
             <Target className="w-5 h-5 text-amber-500" />
             Practice Weak Skills
         </h2>
         
-        <div className="rounded-xl border border-amber-200 bg-amber-50 shadow-sm hover:shadow-md transition-all duration-300">
+        <div className="bg-yellow-400/10 border border-yellow-300/40 rounded-2xl p-4 backdrop-blur-lg shadow-[0_0_50px_rgba(250,204,21,0.4)] animate-pulse transition-all duration-300 hover:scale-[1.03] hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
           <div className="p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
              <div className="space-y-1 text-center sm:text-left">
-                <h3 className="font-bold text-amber-900 text-lg">
+                <h3 className="text-white/90 font-medium text-lg">
                    Practice {targetLesson.lessonTitle || "Recent Topics"} Again
                 </h3>
-                <p className="text-sm text-amber-700/80">
+                <p className="text-sm text-white/70">
                    Improve your understanding and earn +10 bonus XP!
                 </p>
              </div>

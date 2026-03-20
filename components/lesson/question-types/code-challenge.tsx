@@ -8,8 +8,9 @@ import type { Question } from "@/lib/supabase/queries";
 import { cn } from "@/lib/utils";
 import { simulatePythonOutput } from "@/lib/utils/code-executor";
 
-function normalize(output: string) {
-  return output.trim().replace(/\s+/g, " ");
+function normalize(str: string) {
+  // Convert literal backslash-n to actual newlines, then trim trailing whitespaces
+  return str.replace(/\\n/g, "\n").trim().replace(/\r\n/g, "\n").replace(/\s+$/gm, "");
 }
 
 interface CodeChallengeProps {
@@ -37,10 +38,12 @@ export function CodeChallenge({ question, expectedOutput, onCorrect, onIncorrect
         
         if (!expectedOutput) return;
 
-        console.log("EXPECTED:", expectedOutput);
-        console.log("ACTUAL:", out);
-        
-        if (normalize(out) === normalize(expectedOutput)) {
+        console.log("USER:", JSON.stringify(out));
+        console.log("EXPECTED:", JSON.stringify(expectedOutput));
+
+        const isCorrect = normalize(out) === normalize(expectedOutput);
+
+        if (isCorrect) {
            setShowMismatch(false);
            onCorrect(code);
         } else {
@@ -68,11 +71,11 @@ export function CodeChallenge({ question, expectedOutput, onCorrect, onIncorrect
 
                {/* Output block */}
                {output !== null && (
-                  <div className="bg-muted rounded-lg p-3 text-sm font-mono mt-3 max-w-3xl mx-auto shadow-inner border border-border">
-                     <div className="text-muted-foreground mb-1 select-none border-b border-border/50 pb-1">Your Output</div>
-                     <div className="whitespace-pre-wrap">{output || " "}</div>
+                  <div className="bg-gray-100 rounded-lg p-3 text-sm font-mono mt-3 max-w-3xl mx-auto shadow-inner border border-gray-300 text-gray-800">
+                     <div className="text-gray-600 font-bold mb-1 select-none border-b border-gray-300 pb-1">Your Output</div>
+                     <div className="whitespace-pre-wrap text-black font-semibold">{output || " "}</div>
                      {showMismatch && expectedOutput && (
-                        <div className="mt-4 pt-4 border-t border-border/50 text-red-400 whitespace-pre-wrap font-bold">
+                        <div className="mt-4 pt-4 border-t border-gray-300 text-red-500 whitespace-pre-wrap font-bold">
                            <div>Expected: {expectedOutput}</div>
                            <div>Got: {output}</div>
                         </div>
@@ -86,13 +89,7 @@ export function CodeChallenge({ question, expectedOutput, onCorrect, onIncorrect
                      size="lg" 
                      onClick={handleRunCode}
                      disabled={isChecking || code.trim().length === 0}
-                     variant="outline"
-                     className={cn(
-                        "px-8 py-6 rounded-2xl border-b-4 text-xl font-bold transition-all shadow-sm flex items-center gap-2",
-                        code.trim().length > 0
-                           ? "text-foreground hover:bg-muted"
-                           : "opacity-50 cursor-not-allowed"
-                     )}
+                     className="px-8 py-6 rounded-2xl border-2 border-b-4 text-xl font-bold transition-all shadow-sm flex items-center gap-2 bg-white border-gray-300 text-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                      <Play className="w-5 h-5 fill-current" />
                      Run Code
@@ -102,12 +99,7 @@ export function CodeChallenge({ question, expectedOutput, onCorrect, onIncorrect
                      size="lg" 
                      onClick={handleCheckAnswer}
                      disabled={isChecking || code.trim().length === 0}
-                     className={cn(
-                        "px-8 py-6 rounded-2xl border-b-4 text-xl font-bold transition-all shadow-sm flex items-center gap-2",
-                        code.trim().length > 0
-                           ? "bg-emerald-500 hover:bg-emerald-600 border-emerald-700 text-white"
-                           : "bg-muted text-muted-foreground border-transparent opacity-50 cursor-not-allowed hover:bg-muted"
-                     )}
+                     className="px-8 py-6 rounded-2xl border-2 border-b-4 text-xl font-bold transition-all shadow-sm flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 border-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                      <CheckCircle2 className="w-5 h-5" />
                      {isChecking ? "Checking..." : "Check Answer"}
