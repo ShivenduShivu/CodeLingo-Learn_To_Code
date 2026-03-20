@@ -18,12 +18,12 @@ export default async function ProfilePage() {
 
   return (
     <div className="max-w-3xl mx-auto p-6 md:p-12 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div>
-        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">Your Profile</h1>
-        <p className="text-muted-foreground text-lg mt-2">Manage your public information and avatar.</p>
+      <div className="mb-6 text-center">
+        <h1 className="text-3xl font-bold text-white mb-1">Your Coding Identity</h1>
+        <p className="text-sm text-white/70">Customize your avatar and let your code speak for you.</p>
       </div>
 
-      <div className="bg-white border-2 border-slate-100 rounded-3xl p-8 shadow-sm">
+      <div className="w-full flex justify-center">
         <ProfileForm
           initialUsername={dbUser?.username || ""}
           initialAvatar={dbUser?.avatar_url || ""}

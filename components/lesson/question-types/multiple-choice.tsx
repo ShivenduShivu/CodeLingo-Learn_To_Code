@@ -23,17 +23,17 @@ export function MultipleChoice({ question, answers }: MultipleChoiceProps) {
         {answers.map((answer) => {
           const isSelected = selectedAnswer === answer.id;
           
-          let stateClass = "bg-card border-border hover:bg-muted/50 cursor-pointer";
+          let stateClass = "bg-gray-100 border-border hover:bg-gray-200 cursor-pointer text-black";
           
           if (isSelected && !isChecking) {
-             stateClass = "bg-primary/10 border-primary ring-2 ring-primary/20";
+             stateClass = "bg-primary/10 border-primary ring-2 ring-primary/20 text-black";
           } else if (isChecking) {
              if (answer.is_correct) {
                stateClass = "bg-green-500 border-green-600 text-white shadow-md";
              } else if (isSelected && !answer.is_correct) {
                stateClass = "bg-red-500 border-red-600 text-white opacity-90 shadow-md";
              } else {
-               stateClass = "bg-card border-border opacity-50 cursor-not-allowed";
+               stateClass = "bg-gray-100 border-border opacity-50 cursor-not-allowed text-black";
              }
           }
 

@@ -1,13 +1,14 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Star, Lock, Check, Crown } from "lucide-react";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import { Star, Lock, Check, Crown, Flag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Level } from "@/lib/supabase/queries";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
+import { playLevelUpSound } from "@/lib/utils/sound";
 
 export type LevelState = "locked" | "unlocked" | "completed" | "perfected";
 
@@ -17,30 +18,47 @@ interface LevelNodeProps {
   index: number;
 }
 
-export function LevelNode({ level, state, index }: LevelNodeProps) {
+export function LevelNode({
+  level,
+  state,
+  index,
+}: LevelNodeProps) {
   const alignments = ["self-center", "self-start", "self-end", "self-start"];
   const alignment = alignments[index % alignments.length];
 
   const isLocked = state === "locked";
   const isUnlocked = state === "unlocked";
   const isCompleted = state === "completed" || state === "perfected";
+  const isJustCompleted = isUnlocked; // Since we don't have historical transitions, triggering wow effects natively tracking "Arrival Node" (unlocked) currently.
 
   const nodeRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const [showXP, setShowXP] = useState(false);
 
+  const controls = useAnimation();
+
   useEffect(() => {
     // If the URL contains ?completedLevelId=XYZ and this is the matching node, trigger float
     if (searchParams.get("completedLevelId") === level.id) {
-       setShowXP(true);
-       const t = setTimeout(() => setShowXP(false), 2000);
-       return () => clearTimeout(t);
+      setShowXP(true);
+      // Canvas Confetti
+      confetti({
+        particleCount: 100,
+        spread: 80,
+        origin: { y: 0.6 }
+      });
+      // Screen Shake Element
+      controls.start({
+        x: [0, -8, 8, -5, 5, 0],
+        transition: { duration: 0.5, ease: "easeInOut", delay: 0.2 }
+      });
+      try {
+        playLevelUpSound();
+      } catch (e) { }
+      const t = setTimeout(() => setShowXP(false), 2000);
+      return () => clearTimeout(t);
     }
-  }, [searchParams, level.id]);
-
-  useEffect(() => {
-    // Window scroll is completely managed by MapContainer Parallax Tracking now
-  }, [isUnlocked]);
+  }, [searchParams, level.id, controls]);
 
   let bgColor = "bg-muted-foreground/20";
   let borderColor = "border-muted-foreground/30";
@@ -56,18 +74,31 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
     iconColor = "text-white";
   }
 
+  const Icon = isLocked ? Lock : isCompleted ? Check : Star;
+  const isCheckpoint = (index + 1) % 5 === 0;
+
   const NodeInner = (
     <motion.div
       ref={nodeRef}
       whileHover={!isLocked ? { scale: 1.2, rotateY: 10 } : {}}
       whileTap={!isLocked ? { scale: 0.95 } : {}}
-      animate={isCompleted ? { scale: [1, 1.3, 1] } : {}}
+      animate={controls}
       transition={isCompleted ? { duration: 0.6, ease: "easeOut" } : { type: "spring", stiffness: 200, damping: 15 }}
       className="relative group flex flex-col items-center hover:shadow-2xl transition-all"
     >
+      {isCheckpoint && (
+        <motion.div
+          className="absolute -top-10 text-4xl drop-shadow-xl z-20"
+          animate={{ y: [0, -5, 0] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+        >
+          🏁
+        </motion.div>
+      )}
       <div
         className={cn(
-          "relative z-10 w-24 h-24 rounded-full flex flex-col items-center justify-center border-b-8 transition-shadow",
+          "relative z-10 rounded-full flex flex-col items-center justify-center border-b-8 transition-shadow",
+          isCheckpoint ? "w-28 h-28" : "w-24 h-24",
           bgColor,
           borderColor,
           isLocked && "bg-gray-300 opacity-50 cursor-not-allowed",
@@ -111,7 +142,7 @@ export function LevelNode({ level, state, index }: LevelNodeProps) {
       </div>
 
       {/* Floating Tooltip Label */}
-      <div className="absolute top-full mt-8 bg-card px-3 py-1.5 rounded-lg shadow-md border-2 border-border text-xs font-bold text-foreground pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap left-1/2 -translate-x-1/2">
+      <div className="absolute top-full mt-8 bg-white/10 backdrop-blur-xl px-3 py-1.5 rounded-xl shadow-2xl border border-white/10 text-xs font-bold text-white pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap left-1/2 -translate-x-1/2">
         {isLocked ? "Complete previous level to unlock" : `${level.xp_reward} XP Reward`}
       </div>
     </motion.div>

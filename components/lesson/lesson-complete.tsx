@@ -16,7 +16,7 @@ interface LessonCompleteProps {
 
 export function LessonComplete({ xp, stars, streak, achievements, trackId }: LessonCompleteProps) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background relative z-50 p-6">
+    <div className="flex flex-col items-center justify-center min-h-screen relative z-50 p-6">
       <motion.div 
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -26,15 +26,15 @@ export function LessonComplete({ xp, stars, streak, achievements, trackId }: Les
         <div className="w-32 h-32 mx-auto rounded-full bg-green-500 flex items-center justify-center mb-8 shadow-xl shadow-green-500/20">
           <span className="text-6xl">🎉</span>
         </div>
-        <h1 className="text-4xl font-extrabold text-foreground">Level Complete</h1>
+        <h1 className="text-4xl font-extrabold text-white">Level Complete</h1>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-3 gap-4 mt-8"
         >
-          <div className="bg-card border-2 border-border border-b-4 rounded-xl p-4 flex flex-col items-center justify-center">
-            <div className="text-muted-foreground text-sm font-bold uppercase mb-1">XP</div>
+          <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col items-center justify-center shadow-xl">
+            <div className="text-white/70 text-sm font-bold uppercase mb-1">XP</div>
             <motion.div 
               initial={{ scale: 0.5, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -44,8 +44,8 @@ export function LessonComplete({ xp, stars, streak, achievements, trackId }: Les
               +{xp}
             </motion.div>
           </div>
-          <div className="bg-card border-2 border-border border-b-4 rounded-xl p-4 flex flex-col items-center justify-center">
-            <div className="text-muted-foreground text-sm font-bold uppercase mb-1">Stars</div>
+          <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col items-center justify-center shadow-xl">
+            <div className="text-white/70 text-sm font-bold uppercase mb-1">Stars</div>
             <div className="flex gap-1 h-8 items-center justify-center">
               {stars > 0 ? (
                 Array.from({ length: stars }).map((_, i) => (
@@ -64,8 +64,8 @@ export function LessonComplete({ xp, stars, streak, achievements, trackId }: Les
               )}
             </div>
           </div>
-          <div className="bg-card border-2 border-border border-b-4 rounded-xl p-4 flex flex-col items-center justify-center">
-            <div className="text-muted-foreground text-sm font-bold uppercase mb-1">Streak</div>
+          <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col items-center justify-center shadow-xl">
+            <div className="text-white/70 text-sm font-bold uppercase mb-1">Streak</div>
             <motion.div 
               initial={{ scale: 0.5, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -83,11 +83,11 @@ export function LessonComplete({ xp, stars, streak, achievements, trackId }: Les
         )}
 
         <div className="pt-12">
-           <Link href={`/tracks/${trackId}`}>
-             <Button className="w-full py-6 text-xl font-bold bg-primary hover:bg-primary/90 rounded-2xl border-b-4 border-primary-foreground/20">
-               Continue Learning &rarr;
-             </Button>
-           </Link>
+             <Link href={`/tracks/${trackId}`}>
+               <Button className="w-full py-6 text-xl font-bold bg-emerald-500 hover:bg-emerald-400 rounded-2xl border border-white/20 text-white">
+                 Continue Learning &rarr;
+               </Button>
+             </Link>
         </div>
         
       </motion.div>

@@ -8,21 +8,11 @@ interface MapContainerProps {
   progressPercentage?: number;
 }
 
-import { useState } from "react";
+import { useEffect } from "react";
 
-export function MapContainer({ children, progressPercentage = 0 }: { children: ReactNode, progressPercentage?: number }) {
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-
+export function MapContainer({ children, progressPercentage = 0, xp = 0, streak = 0, levelsCount = 1 }: { children: ReactNode, progressPercentage?: number, xp?: number, streak?: number, levelsCount?: number }) {
   return (
-    <div
-      className="w-full min-h-screen overflow-hidden relative group"
-      style={{ transform: `perspective(1200px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)` }}
-      onMouseMove={(e) => {
-        const x = (e.clientX / window.innerWidth - 0.5) * 10;
-        const y = (e.clientY / window.innerHeight - 0.5) * 10;
-        setTilt({ x, y });
-      }}
-    >
+    <div className="w-full min-h-screen bg-gradient-to-b from-emerald-50 to-green-100 relative overflow-hidden">
       {/* 3. Parallax Background */}
       <div className="absolute inset-0 -z-10">
         {/* Layer 1: Linear Gradient */}
@@ -37,9 +27,8 @@ export function MapContainer({ children, progressPercentage = 0 }: { children: R
         />
       </div>
       {/* Floating Particles Background */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
         {Array.from({ length: 20 }).map((_, i) => {
-          // Deterministic values mapped to index to prevent NextJS React SSR hydration mismatches
           const leftPos = (i * 37) % 100;
           const startY = 800 + ((i * 101) % 400);
           const startOpacity = 0.2 + ((i * 13) % 50) / 100;
@@ -48,7 +37,7 @@ export function MapContainer({ children, progressPercentage = 0 }: { children: R
 
           return (
             <motion.div
-              key={i}
+              key={`particle-${i}`}
               className="w-2 h-2 bg-green-300 rounded-full absolute"
               style={{ left: `${leftPos}%` }}
               initial={{ y: startY, opacity: startOpacity }}
@@ -64,13 +53,30 @@ export function MapContainer({ children, progressPercentage = 0 }: { children: R
         })}
       </div>
 
-      <motion.div
-        className="w-full h-full relative flex flex-col items-center z-10 pt-16 pb-32"
-        animate={{ y: `-${progressPercentage * 10}px` }}
-        transition={{ type: "spring", stiffness: 60, damping: 20 }}
-      >
+      {/* SCROLLABLE WORLD CONTAINER */}
+      <div className="relative mx-auto max-w-md py-20 z-20">
+        {/* Floating Environment Objects */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          {Array.from({ length: 15 }).map((_, i) => {
+            const decoration = i % 3 === 0 ? "🌴" : i % 3 === 1 ? "🌲" : "⛰️";
+            const topPercent = ((i * 73) % 90) + 5;
+            const leftPercent = ((i * 17) % 80) + 10;
+            const size = i % 2 === 0 ? "text-4xl" : "text-3xl";
+
+            return (
+              <div
+                key={`env-${i}`}
+                className={`absolute ${size} drop-shadow-lg`}
+                style={{ top: `${topPercent}%`, left: `${leftPercent}%` }}
+              >
+                <div className="animate-bounce" style={{ animationDuration: `${3 + (i % 3)}s` }}>{decoration}</div>
+              </div>
+            );
+          })}
+        </div>
+
         {children}
-      </motion.div>
+      </div>
     </div>
   );
 }

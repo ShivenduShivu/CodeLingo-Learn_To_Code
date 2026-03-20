@@ -19,7 +19,7 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     const result = await login(formData);
-    
+
     if (result?.error) {
       setError(result.error);
       setLoading(false);
@@ -49,18 +49,22 @@ export default function LoginPage() {
       </div>
 
       <form action={handleSubmit} className="space-y-4">
+        <div className="mb-4 px-4 py-3 rounded-lg bg-yellow-100 text-yellow-800 text-sm border border-yellow-300">
+          For now, you can use any email and password to sign up, then you can use that to log in.
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="email" className="font-bold">Email</Label>
-          <Input 
-            id="email" 
-            name="email" 
-            type="email" 
-            placeholder="you@example.com" 
-            required 
-            className="h-12 border-2 rounded-xl focus-visible:ring-primary focus-visible:ring-offset-2"
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 caret-black"
           />
         </div>
-        
+
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password" className="font-bold">Password</Label>
@@ -68,12 +72,12 @@ export default function LoginPage() {
               Forgot password?
             </Link>
           </div>
-          <Input 
-            id="password" 
-            name="password" 
-            type="password" 
-            required 
-            className="h-12 border-2 rounded-xl focus-visible:ring-primary focus-visible:ring-offset-2"
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 caret-black"
           />
         </div>
 
@@ -84,8 +88,8 @@ export default function LoginPage() {
         )}
 
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={loading}
             className="w-full h-14 text-lg font-bold rounded-xl shadow-[0_4px_0_hsl(var(--primary-foreground)/0.2)] hover:translate-y-[2px] hover:shadow-[0_2px_0_hsl(var(--primary-foreground)/0.2)] transition-all active:translate-y-[4px] active:shadow-none bg-primary hover:bg-primary/90 text-primary-foreground"
           >
@@ -110,9 +114,9 @@ export default function LoginPage() {
           <Github className="mr-2 h-5 w-5" />
           Github
         </Button>
-        <Button 
-          variant="outline" 
-          type="button" 
+        <Button
+          variant="outline"
+          type="button"
           className="h-12 border-2 rounded-xl border-border hover:bg-secondary font-bold"
           onClick={handleGoogleLogin}
         >

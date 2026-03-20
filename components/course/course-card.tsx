@@ -31,10 +31,10 @@ export function CourseCard({ course, isEnrolled, progressSummary }: CourseCardPr
       </div>
 
       <div className="flex flex-col flex-1 h-full">
-        <h3 className="text-2xl font-bold tracking-tight mb-2 text-foreground">
+        <h3 className="text-2xl font-bold tracking-tight mb-2 text-white">
           {course.title}
         </h3>
-        <p className="text-muted-foreground line-clamp-2 text-sm flex-1">
+        <p className="text-white/70 line-clamp-2 text-sm flex-1">
           {course.description}
         </p>
         
@@ -53,15 +53,15 @@ export function CourseCard({ course, isEnrolled, progressSummary }: CourseCardPr
                   />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-y-1 text-xs font-medium text-muted-foreground">
+                <div className="grid grid-cols-2 gap-y-1 text-xs font-medium text-white/70">
                   <div>
-                    <span className="text-foreground font-bold">{progressSummary.completedLevels} / {progressSummary.totalLevels}</span> Levels
+                    <span className="text-white/90 font-medium">{progressSummary.completedLevels} / {progressSummary.totalLevels}</span> Levels
                   </div>
-                  <div className="text-right text-xp font-bold">
+                  <div className="text-right text-emerald-400 font-bold">
                     {progressSummary.xpEarned} XP Earned
                   </div>
                   <div className="col-span-2 truncate mt-1">
-                    Track: <span className="text-foreground font-bold">{progressSummary.track_title}</span>
+                    Track: <span className="text-white/90 font-medium">{progressSummary.track_title}</span>
                   </div>
                 </div>
               </div>
@@ -81,11 +81,16 @@ export function CourseCard({ course, isEnrolled, progressSummary }: CourseCardPr
     </>
   );
 
+  let baseCardClass = "bg-white/10 backdrop-blur-lg border border-white/20 shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:scale-[1.03] hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.6)]";
+  
+  if (course.slug === "python-basics" || course.title.toLowerCase().includes("python") || course.slug.includes("machine-learning") || course.title.toLowerCase().includes("machine learning")) {
+    baseCardClass = "bg-white/10 backdrop-blur-lg border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:scale-105 transition-all";
+  }
+
   const wrapperProps = {
-    whileHover: { scale: 1.05, y: -5, transition: { type: "spring" as const, stiffness: 300 } },
-    whileTap: { scale: 0.95 },
-    className: "group relative flex flex-col justify-between overflow-hidden rounded-2xl border-2 border-b-8 border-border hover:border-emerald-300 hover:shadow-xl bg-card p-6 cursor-pointer transition-all duration-300 h-full",
-    style: { boxShadow: `0 0 0 0 ${course.color_hex}00` }
+    whileTap: { scale: 0.98 },
+    className: `group relative flex flex-col justify-between overflow-hidden rounded-2xl p-5 transition-all duration-300 cursor-pointer h-full text-white ${baseCardClass}`,
+    style: { }
   };
 
   if (isEnrolled) {

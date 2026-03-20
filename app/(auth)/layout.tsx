@@ -42,7 +42,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-5xl font-extrabold text-white tracking-tight leading-tight mb-6"
           >
-            Learn AI and Programming like Duolingo.
+            Learn AI and Programming With CodeLingo
           </motion.h1>
           
           <motion.p 

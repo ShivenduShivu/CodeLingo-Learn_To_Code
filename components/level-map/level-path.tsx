@@ -11,38 +11,24 @@ interface LevelPathProps {
 }
 
 function generatePath(levelsCount: number) {
-  let d = "M150 50";
-  const segments = Math.max(1, Math.ceil(levelsCount / 2));
-  for(let i=0; i<segments; i++) {
-    const y0 = 50 + i * 300;
-    const y1 = y0 + 300;
-    if (i % 2 === 0) {
-      d += ` C50 ${y0 + 100}, 250 ${y0 + 200}, 150 ${y1}`;
-    } else {
-      d += ` C250 ${y0 + 100}, 50 ${y0 + 200}, 150 ${y1}`;
-    }
+  let d = "M100 0";
+  for (let i = 0; i < levelsCount; i++) {
+    const y0 = i * 160;
+    const y1 = (i + 1) * 160;
+    const controlX = i % 2 === 0 ? 0 : 200;
+    d += ` Q ${controlX} ${y0 + 80}, 100 ${y1}`;
   }
   return d;
 }
 
-const getNodePos = (index: number) => {
-  const y = 50 + index * 150;
-  let x = 150;
-  if (index % 2 !== 0) {
-    const segmentIndex = Math.floor(index / 2);
-    x = segmentIndex % 2 === 0 ? 80 : 220; 
-  }
-  return { x, y };
-};
-
 export function LevelPath({ levels, currentLevelNumber, progressPercentage = 0 }: LevelPathProps) {
   const pathString = generatePath(levels.length);
-  const totalHeight = 50 + Math.max(1, Math.ceil(levels.length / 2)) * 300 + 100;
+  const totalHeight = levels.length * 160;
 
   return (
-    <div className="relative w-[300px] mx-auto overflow-visible pb-32" style={{ height: `${totalHeight}px` }}>
+    <div className="relative w-full overflow-visible" style={{ height: `${totalHeight}px` }}>
       {/* SVG Track */}
-      <svg width="300" height={totalHeight} viewBox={`0 0 300 ${totalHeight}`} className="absolute top-0 left-0 pointer-events-none z-0" style={{ filter: "drop-shadow(0 0 8px rgba(34,197,94,0.4))" }}>
+      <svg width="200" height={totalHeight} viewBox={`0 0 200 ${totalHeight}`} className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none z-0" style={{ filter: "drop-shadow(0 0 8px rgba(34,197,94,0.4))" }}>
         {/* Road Depth Background */}
         <path
           d={pathString}
@@ -82,21 +68,22 @@ export function LevelPath({ levels, currentLevelNumber, progressPercentage = 0 }
       </svg>
 
       {/* The Animated Car with Trail */}
-      <motion.div
-        className="absolute z-30 drop-shadow-2xl flex items-center justify-center -ml-8 -mt-8"
-        style={{
-          offsetPath: `path('${pathString}')`,
-          offsetRotate: "auto"
-        } as any}
-        animate={{
-          offsetDistance: `${progressPercentage}%`,
-          scale: [1, 1.05, 1]
-        }}
-        transition={{ 
-          duration: 2.5, 
-          ease: [0.22, 1, 0.36, 1]
-        }}
-      >
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] z-30 drop-shadow-2xl pointer-events-none" style={{ height: `${totalHeight}px` }}>
+        <motion.div
+          className="absolute top-0 left-0 flex items-center justify-center -ml-7 -mt-7 pointer-events-auto"
+          style={{
+            offsetPath: `path('${pathString}')`,
+            offsetRotate: "auto"
+          } as any}
+          animate={{
+            offsetDistance: ["0%", `${progressPercentage}%`],
+            scale: [1, 1.05, 1]
+          }}
+          transition={{ 
+            duration: 3, 
+            ease: [0.22, 1, 0.36, 1]
+          }}
+        >
         {/* Trail Effect */}
         <motion.div
           className="absolute w-10 h-3 bg-green-400 blur-md rounded-full -z-10 translate-y-4"
@@ -109,6 +96,7 @@ export function LevelPath({ levels, currentLevelNumber, progressPercentage = 0 }
           whileHover={{ scale: 1.1, rotate: 5 }}
         />
       </motion.div>
+      </div>
 
       {/* Level Nodes Mapping */}
       {levels.map((level, index) => {
@@ -120,16 +108,12 @@ export function LevelPath({ levels, currentLevelNumber, progressPercentage = 0 }
           state = "unlocked";
         }
 
-        const { x, y } = getNodePos(index);
-
         return (
           <div 
             key={level.id} 
-            className="absolute z-10"
+            className="absolute left-1/2 -translate-x-1/2 z-10"
             style={{ 
-              top: `${y}px`, 
-              left: `${x}px`,
-              transform: "translate(-50%, -50%)"
+              top: `${index * 160}px`
             }}
           >
              <LevelNode 

@@ -39,9 +39,9 @@ export function ProfileForm({ initialUsername, initialAvatar, email }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-md">
-      <div className="flex items-center gap-6">
-        <div className="relative w-24 h-24 rounded-full overflow-hidden bg-slate-100 border-4 border-slate-200 shadow-sm shrink-0">
+    <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-2xl p-8 max-w-md mx-auto border border-white/20 hover:scale-[1.01] transition-transform duration-300">
+      <div className="flex flex-col items-center mb-6">
+        <div className="relative w-28 h-28 rounded-full overflow-hidden bg-slate-100 ring-4 ring-green-400/40 shadow-[0_0_25px_rgba(34,197,94,0.4)] mb-3 hover:scale-105 transition-transform duration-200 shrink-0">
           <Image 
              src={avatar || "https://api.dicebear.com/7.x/bottts/svg?seed=fallback"} 
              alt="Avatar" 
@@ -50,70 +50,59 @@ export function ProfileForm({ initialUsername, initialAvatar, email }: Props) {
              unoptimized // For dicebear dynamic SVGs
           />
         </div>
-        <div className="space-y-1">
-          <p className="font-bold text-slate-900">Current Avatar</p>
-          <p className="text-xs text-slate-500 font-medium leading-relaxed">Choose an avatar from the options below to represent your profile.</p>
+        <p className="text-2xl font-bold text-gray-900 mt-2">{username}</p>
+        <p className="text-sm text-gray-500">{email}</p>
+      </div>
+
+      <div className="mt-6 space-y-4">
+        <div className="space-y-2">
+          <label className="text-sm font-extrabold text-slate-700 uppercase tracking-widest">Username</label>
+          <input 
+            type="text" 
+            required
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-400 focus:outline-none transition-all duration-200 ease-out font-medium text-slate-800"
+          />
         </div>
-      </div>
 
-      <div className="space-y-2 mt-8">
-        <label className="text-sm font-extrabold text-slate-700 uppercase tracking-widest">Email Address</label>
-        <input 
-          type="email" 
-          value={email}
-          disabled
-          className="w-full p-4 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-500 font-medium cursor-not-allowed"
-        />
-        <p className="text-xs text-slate-400 font-medium">Your account email cannot be changed.</p>
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-extrabold text-slate-700 uppercase tracking-widest">Username</label>
-        <input 
-          type="text" 
-          required
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="w-full p-4 rounded-2xl border-2 border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-400/20 outline-none transition-all font-medium text-slate-800"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-extrabold text-slate-700 uppercase tracking-widest">Avatar Selection</label>
-        <div className="grid grid-cols-3 gap-4">
-          {["coder", "bot", "rocket", "pixel", "dev", "neon"].map((seed) => {
-            const seedUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`;
-            const isSelected = avatar === seedUrl;
-            return (
-              <button
-                key={seed}
-                type="button"
-                onClick={() => setAvatar(seedUrl)}
-                className={`relative w-full aspect-square rounded-2xl overflow-hidden border-4 transition-all ${
-                  isSelected ? "border-indigo-500 shadow-lg scale-105" : "border-slate-200 hover:border-indigo-300"
-                }`}
-              >
-                <Image src={seedUrl} alt={seed} fill unoptimized className="object-cover bg-slate-50" />
-              </button>
-            );
-          })}
+        <div className="space-y-2">
+          <label className="text-sm font-extrabold text-slate-700 uppercase tracking-widest">Avatar Selection</label>
+          <div className="grid grid-cols-3 gap-4 mt-6">
+            {["coder", "bot", "rocket", "pixel", "dev", "neon"].map((seed) => {
+              const seedUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`;
+              const isSelected = avatar === seedUrl;
+              return (
+                <button
+                  key={seed}
+                  type="button"
+                  onClick={() => setAvatar(seedUrl)}
+                  className={`relative w-full aspect-square p-2 rounded-xl border hover:scale-110 hover:shadow-lg transition-all duration-200 ease-out cursor-pointer ${
+                    isSelected ? "border-green-500 bg-green-50 scale-110 shadow-[0_0_15px_rgba(34,197,94,0.5)]" : "border-slate-200 hover:border-indigo-300"
+                  }`}
+                >
+                  <Image src={seedUrl} alt={seed} fill unoptimized className="object-cover rounded-lg p-1" />
+                </button>
+              );
+            })}
+          </div>
         </div>
+
+        {message && (
+          <div className={`p-4 rounded-xl text-sm font-bold border-2 ${message.startsWith("✅") ? "bg-green-50 text-green-600 border-green-100" : "bg-red-50 text-red-600 border-red-100"}`}>
+            {message}
+          </div>
+        )}
+
+        <Button 
+           type="submit" 
+           disabled={isPending} 
+           className="mt-6 w-full py-3 h-14 rounded-xl bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-200 ease-out"
+        >
+          {isPending ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+          Save Profile
+        </Button>
       </div>
-
-      {message && (
-        <div className={`p-4 rounded-2xl text-sm font-bold border-2 ${message.startsWith("✅") ? "bg-green-50 text-green-600 border-green-100" : "bg-red-50 text-red-600 border-red-100"}`}>
-          {message}
-        </div>
-      )}
-
-      <Button 
-         type="submit" 
-         disabled={isPending} 
-         className="w-full rounded-2xl h-14 text-lg font-bold bg-indigo-500 hover:bg-indigo-600 text-white shadow-xl shadow-indigo-500/20 active:scale-95 transition-all mt-8"
-      >
-        {isPending ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-        Save Profile Optimization
-      </Button>
     </form>
   );
 }

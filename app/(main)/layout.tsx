@@ -8,7 +8,7 @@ type MainLayoutProps = {
 
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
-    <div className="flex bg-slate-50 min-h-screen">
+    <div className="flex min-h-screen relative z-10 w-full">
       {/* Hidden strictly on mobile screens, shown on md and above */}
       <Sidebar />
       

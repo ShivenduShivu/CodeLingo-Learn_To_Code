@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { ParticlesBackground } from "@/components/layout/particles-background";
 import "../styles/globals.css";
 import { SoundProvider } from "@/components/providers/sound-provider";
 
@@ -17,9 +18,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased text-foreground bg-background`}>
-        <SoundProvider />
-        {children}
+      <body className={`${inter.variable} font-sans antialiased text-white min-h-screen bg-gradient-to-br from-[#0f172a] via-[#020617] to-black relative`}>
+        {/* Global Light Glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,197,94,0.2),transparent)] pointer-events-none z-0" />
+        
+        {/* Global Floating Particles */}
+        <ParticlesBackground />
+
+        <div className="relative z-10 w-full h-full">
+          <SoundProvider />
+          {children}
+        </div>
       </body>
     </html>
   );

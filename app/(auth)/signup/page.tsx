@@ -57,7 +57,7 @@ export default function SignupPage() {
             type="email" 
             placeholder="you@example.com" 
             required 
-            className="h-12 border-2 rounded-xl focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 caret-black"
           />
         </div>
         
@@ -68,7 +68,7 @@ export default function SignupPage() {
             name="password" 
             type="password" 
             required 
-            className="h-12 border-2 rounded-xl focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 caret-black"
           />
         </div>
 

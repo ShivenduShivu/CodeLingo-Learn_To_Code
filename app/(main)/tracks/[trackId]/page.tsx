@@ -24,6 +24,8 @@ export default async function TrackPage({ params }: TrackPageProps) {
   const { data: { user } } = await supabase.auth.getUser();
   
   let currentLevelNumber = 1;
+  let userXP = 0;
+  let userStreak = 0;
 
   if (user) {
     // A level is unlocked when the previous level exists in level_progress
@@ -45,6 +47,17 @@ export default async function TrackPage({ params }: TrackPageProps) {
     }
 
     currentLevelNumber = highestUnlocked;
+
+    const { data: profileObj } = await supabase
+      .from('users')
+      .select('xp, streak')
+      .eq('id', user.id)
+      .single();
+
+    if (profileObj) {
+      userXP = profileObj.xp || 0;
+      userStreak = profileObj.streak || 0;
+    }
   }
 
   // Cap at 100% just in case
@@ -59,7 +72,7 @@ export default async function TrackPage({ params }: TrackPageProps) {
         <p className="text-muted-foreground text-lg">Follow the path and complete lessons to unlock your skills.</p>
       </div>
       
-      <MapContainer>
+      <MapContainer progressPercentage={progressPercentage} xp={userXP} streak={userStreak} levelsCount={levels.length}>
         <SkipNode trackId={params.trackId} />
         <LevelPath levels={levels} currentLevelNumber={currentLevelNumber} progressPercentage={progressPercentage} />
       </MapContainer>
