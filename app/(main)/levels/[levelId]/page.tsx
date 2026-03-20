@@ -1,7 +1,5 @@
 import { getLessons } from "@/lib/supabase/queries";
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
-import { GlassCard } from "@/components/ui/glass-card";
 
 export const dynamic = 'force-dynamic';
 

@@ -3,14 +3,7 @@
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
 
-interface MapContainerProps {
-  children: ReactNode;
-  progressPercentage?: number;
-}
-
-import { useEffect } from "react";
-
-export function MapContainer({ children, progressPercentage = 0, xp = 0, streak = 0, levelsCount = 1 }: { children: ReactNode, progressPercentage?: number, xp?: number, streak?: number, levelsCount?: number }) {
+export function MapContainer({ children, progressPercentage = 0 }: { children: ReactNode, progressPercentage?: number }) {
   return (
     <div className="w-full min-h-screen bg-gradient-to-b from-emerald-50 to-green-100 relative overflow-hidden">
       {/* 3. Parallax Background */}

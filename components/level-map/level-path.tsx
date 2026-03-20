@@ -74,7 +74,7 @@ export function LevelPath({ levels, currentLevelNumber, progressPercentage = 0 }
           style={{
             offsetPath: `path('${pathString}')`,
             offsetRotate: "auto"
-          } as any}
+          } as unknown as React.CSSProperties}
           animate={{
             offsetDistance: ["0%", `${progressPercentage}%`],
             scale: [1, 1.05, 1]

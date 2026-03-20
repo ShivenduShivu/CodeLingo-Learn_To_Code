@@ -5,7 +5,6 @@ import { CodeEditor } from "@/components/lesson/code-editor";
 import { Button } from "@/components/ui/button";
 import { Play, CheckCircle2 } from "lucide-react";
 import type { Question } from "@/lib/supabase/queries";
-import { cn } from "@/lib/utils";
 import { simulatePythonOutput } from "@/lib/utils/code-executor";
 
 function normalize(str: string) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
-import { Star, Lock, Check, Crown, Flag } from "lucide-react";
+import { Star, Lock, Check, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Level } from "@/lib/supabase/queries";
 import Link from "next/link";
@@ -29,7 +29,6 @@ export function LevelNode({
   const isLocked = state === "locked";
   const isUnlocked = state === "unlocked";
   const isCompleted = state === "completed" || state === "perfected";
-  const isJustCompleted = isUnlocked; // Since we don't have historical transitions, triggering wow effects natively tracking "Arrival Node" (unlocked) currently.
 
   const nodeRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
@@ -74,7 +73,6 @@ export function LevelNode({
     iconColor = "text-white";
   }
 
-  const Icon = isLocked ? Lock : isCompleted ? Check : Star;
   const isCheckpoint = (index + 1) % 5 === 0;
 
   const NodeInner = (
