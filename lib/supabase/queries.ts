@@ -1,3 +1,8 @@
+/**
+ * Data access layer: typed Supabase queries for courses, tracks, levels,
+ * lessons, progress, stats, achievements and the leaderboard.
+ */
+
 import { createClient } from './server'
 import { calculateStreak } from '@/lib/utils/streak'
 

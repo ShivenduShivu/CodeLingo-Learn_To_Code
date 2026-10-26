@@ -1,3 +1,7 @@
+/**
+ * AI hints: Socratic hint generation streamed from Gemini via the Vercel AI SDK.
+ */
+
 import { streamText } from "ai";
 import { google } from "@ai-sdk/google";
 

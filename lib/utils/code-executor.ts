@@ -1,4 +1,5 @@
-// Utility for basic Python simulation without arbitrary execution
+// Utility for basic Python simulation without arbitrary execution.
+// Mirrors common print() patterns so code challenges can be graded safely in the browser.
 
 export function simulatePythonOutput(code: string): string {
     // 1. Extract content inside print()

@@ -1,3 +1,8 @@
+/**
+ * Achievement evaluator: checks unlock rules when progress events fire and
+ * returns any newly unlocked achievements.
+ */
+
 import { createClient } from "@/lib/supabase/server";
 
 export type UnlockEvent = {

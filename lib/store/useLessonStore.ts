@@ -1,3 +1,8 @@
+/**
+ * Lesson store (Zustand): client-side state for the active lesson
+ * (question index, selection, hearts, progress).
+ */
+
 import { create } from 'zustand';
 
 interface LessonState {
