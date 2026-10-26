@@ -1,3 +1,8 @@
+/**
+ * Root layout: loads the Inter font and global styles, renders the ambient glow +
+ * particle backdrop, and mounts the SoundProvider for every route.
+ */
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ParticlesBackground } from "@/components/layout/particles-background";

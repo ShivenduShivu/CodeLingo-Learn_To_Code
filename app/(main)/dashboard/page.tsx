@@ -1,3 +1,7 @@
+/**
+ * Dashboard (server): gathers enrolled courses, XP/streak stats, daily goals,
+ * achievements and leaderboard rank, then hands them to DashboardContent.
+ */
 
 import { getEnrolledCourses, getCourseProgressMap, getUserStats, getDailyStats, getLatestAchievements, getLeaderboard } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";

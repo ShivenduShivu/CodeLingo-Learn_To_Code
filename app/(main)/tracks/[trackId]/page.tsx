@@ -1,3 +1,8 @@
+/**
+ * Track map: renders a track's levels as the gamified level path, with
+ * per-level lock/complete state for the current user.
+ */
+
 import { getLevels } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";

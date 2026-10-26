@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Auth route group layout: split-screen shell with an animated brand panel on
+ * desktop, wrapping the login and signup forms.
+ */
+
 import { motion } from "framer-motion";
 import { BookOpen } from "lucide-react";
 

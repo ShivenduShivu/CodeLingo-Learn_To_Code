@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Login page: email/password sign-in via the `login` server action, plus
+ * OAuth providers through the Supabase browser client.
+ */
+
 import { login } from "@/app/auth/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

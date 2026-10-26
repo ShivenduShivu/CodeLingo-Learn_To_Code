@@ -1,3 +1,8 @@
+/**
+ * POST /api/ai/hint: streams an AI mentor hint or explanation for the current
+ * question, rate-limited per user and lesson.
+ */
+
 import { NextResponse } from 'next/server';
 import { generateHintStream } from '@/lib/ai/hints';
 import { createClient } from '@/lib/supabase/server';

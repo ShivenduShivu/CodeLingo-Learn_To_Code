@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Signup page: creates an account via the `signup` server action, with
+ * optional OAuth sign-up through the Supabase browser client.
+ */
+
 import { signup } from "@/app/auth/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

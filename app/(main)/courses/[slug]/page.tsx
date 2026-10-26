@@ -1,3 +1,7 @@
+/**
+ * Course detail: resolves a course by slug and shows its learning tracks.
+ */
+
 import { getCourseBySlug, getTracks } from "@/lib/supabase/queries";
 import { notFound } from "next/navigation";
 import Link from "next/link";

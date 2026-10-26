@@ -1,3 +1,7 @@
+/**
+ * Leaderboard: top learners ranked by XP, highlighting the current user.
+ */
+
 import { getLeaderboard } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { Crown, Flame, ArrowUp, ArrowDown } from "lucide-react";

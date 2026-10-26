@@ -1,3 +1,8 @@
+/**
+ * Level launcher: finds the lessons inside a level and routes the learner
+ * into the first one.
+ */
+
 import { getLessons } from "@/lib/supabase/queries";
 import Link from "next/link";
 

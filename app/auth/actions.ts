@@ -1,5 +1,9 @@
 'use server'
 
+/**
+ * Auth server actions: email/password login, signup and sign-out via Supabase.
+ */
+
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 

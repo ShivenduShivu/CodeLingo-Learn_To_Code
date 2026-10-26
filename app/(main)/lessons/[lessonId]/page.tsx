@@ -1,3 +1,8 @@
+/**
+ * Lesson player: loads questions and answers for a lesson and runs them in
+ * the QuizEngine. `?practice=true` replays it as a practice session.
+ */
+
 import { getQuestions, getAnswers, type Answer } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";

@@ -1,3 +1,8 @@
+/**
+ * Authenticated app shell: desktop sidebar, mobile navbar and bottom nav
+ * around every page in the (main) route group.
+ */
+
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { Navbar } from "@/components/layout/navbar";

@@ -1,3 +1,7 @@
+/**
+ * Profile page: loads the user's username and avatar and renders ProfileForm.
+ */
+
 import { createClient } from "@/lib/supabase/server";
 import { ProfileForm } from "@/app/(main)/profile/profile-form";
 import { redirect } from "next/navigation";

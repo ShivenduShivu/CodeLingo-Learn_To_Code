@@ -1,3 +1,8 @@
+/**
+ * Course catalog: lists all courses with the signed-in user's enrollment
+ * state and per-course progress.
+ */
+
 import { CourseList } from "@/components/course/course-list";
 import { getCourses, getEnrolledCourseIds, getCourseProgressMap } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";

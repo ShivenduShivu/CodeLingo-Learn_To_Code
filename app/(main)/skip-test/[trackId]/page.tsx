@@ -1,3 +1,8 @@
+/**
+ * Skip test: builds a placement quiz from a track's levels so experienced
+ * learners can test out of it (completed via the `skipTrack` action).
+ */
+
 import { getLevels, getLessons, getQuestions, getAnswers, type Question, type Answer } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";

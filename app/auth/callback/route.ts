@@ -1,3 +1,8 @@
+/**
+ * OAuth callback: exchanges the Supabase auth code for a session, then
+ * redirects to `next` (defaults to /dashboard).
+ */
+
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 

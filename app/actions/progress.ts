@@ -1,5 +1,10 @@
 "use server";
 
+/**
+ * Progress server actions: records level completion, awards XP, updates
+ * streaks and triggers achievement checks.
+ */
+
 import { createClient } from "@/lib/supabase/server";
 import { checkAchievements } from "@/lib/achievements/evaluator";
 import { revalidatePath } from "next/cache";
