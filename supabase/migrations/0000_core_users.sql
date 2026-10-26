@@ -1,3 +1,5 @@
+-- Migration 0000: public users profile table with row level security policies.
+
 -- Create a table for public users
 create table public.users (
   id uuid primary key references auth.users(id) on delete cascade,

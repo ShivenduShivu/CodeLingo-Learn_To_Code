@@ -1,3 +1,7 @@
+/**
+ * Next.js config: allowed remote image hosts and webpack customisation.
+ */
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {

@@ -1,3 +1,5 @@
+-- Seed data: resets and repopulates courses, tracks, levels and lessons.
+
 -- Clean existing data to avoid conflicts on re-seeds
 TRUNCATE public.courses CASCADE;
 

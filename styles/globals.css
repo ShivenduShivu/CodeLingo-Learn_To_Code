@@ -1,3 +1,7 @@
+/**
+ * Global styles: Tailwind layers, theme tokens and shared base utilities.
+ */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
