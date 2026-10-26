@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Code challenge question: Monaco editor plus simulated Python output,
+ * compared against the expected output.
+ */
+
 import { useState } from "react";
 import { CodeEditor } from "@/components/lesson/code-editor";
 import { Button } from "@/components/ui/button";

@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Level map container: layered parallax background that shifts with track progress.
+ */
+
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
 

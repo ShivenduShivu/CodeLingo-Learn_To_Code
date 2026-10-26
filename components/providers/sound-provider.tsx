@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Sound provider: unlocks the audio context on the first user click, as
+ * browsers require.
+ */
+
 import { useEffect } from "react";
 import { initSound } from "@/lib/utils/sound";
 

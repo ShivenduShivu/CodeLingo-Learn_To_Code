@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Dashboard view (client): animated stats, daily goal, practice card,
+ * achievements and enrolled courses.
+ */
+
 import { motion, useMotionValue, animate, useTransform } from "framer-motion";
 import Link from "next/link";
 import { useEffect } from "react";

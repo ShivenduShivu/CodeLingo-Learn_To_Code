@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * GlassCard: frosted-glass surface with a subtle 3D hover tilt.
+ */
+
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";

@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Quiz engine: drives a lesson end to end (question flow, hearts, feedback,
+ * AI mentor, sounds and the completion screen).
+ */
+
 import { useEffect, useState } from "react";
 import { type Question, type Answer } from "@/lib/supabase/queries";
 import { useLessonStore } from "@/lib/store/useLessonStore";

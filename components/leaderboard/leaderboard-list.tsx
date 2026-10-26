@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Leaderboard list: ranked player rows with crown/medal badges for the top spots.
+ */
+
 import { motion } from "framer-motion";
 import Image from "next/image";
 import type { UserLeaderboard } from "@/lib/supabase/queries";

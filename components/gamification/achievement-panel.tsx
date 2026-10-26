@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Achievement panel: shows the user's most recently unlocked achievements.
+ */
+
 import { Trophy } from "lucide-react";
 import type { Achievement } from "@/lib/supabase/queries";
 import { motion } from "framer-motion";

@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Desktop sidebar: primary navigation with active-route highlighting and logout.
+ */
+
 import { BookOpen, Trophy, User, Home, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";

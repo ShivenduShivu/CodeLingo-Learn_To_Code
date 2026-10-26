@@ -1,3 +1,8 @@
+/**
+ * Course grid: renders CourseCards with enrollment and progress, or an
+ * empty state when there are no courses.
+ */
+
 import { CourseCard } from "./course-card";
 import { type Course, type CourseProgressSummary } from "@/lib/supabase/queries";
 
