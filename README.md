@@ -22,6 +22,10 @@
 
 > 🔗 **[https://codelingo-tawny.vercel.app](https://codelingo-tawny.vercel.app)**
 
+### 🎬 Demo Video
+
+> ▶️ **[Watch the CodeLingo Demo Video](https://drive.google.com/file/d/1rZSGbcepaeYMEQQz5HzAZcyrmlgDMokz/view?usp=sharing)**
+
 > **📝 Note:** For now, you can use any email and password to sign up, then use those same credentials to log in. No verification required!
 
 <br/>
